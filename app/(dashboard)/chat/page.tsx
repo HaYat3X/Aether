@@ -8,7 +8,6 @@ import {
   Send,
   Bot,
   User,
-  Paperclip,
   Sparkles,
   CalendarPlus,
   ListChecks,
@@ -27,12 +26,13 @@ type Message = {
 
 /* ──────────────────────────────────────────
    Initial welcome message
+   Markdown形式で改行は末尾2スペース or 空行
    ────────────────────────────────────────── */
 const WELCOME_MESSAGE: Message = {
   id: "welcome",
   role: "assistant",
   content:
-    "こんにちは！Aetherです。\nスケジュール管理、タスク登録、メモ作成など、なんでもお手伝いします。何をしましょうか？",
+    "こんにちは！**Aether**です。\n\nスケジュール管理、タスク登録、メモ作成など、なんでもお手伝いします。\n\n何をしましょうか？",
   timestamp: "—",
 };
 
@@ -44,28 +44,6 @@ const QUICK_ACTIONS = [
   { icon: ListChecks, label: "タスク登録", prompt: "タスクを新しく登録して" },
   { icon: Sparkles, label: "今日の要約", prompt: "今日の予定とタスクをまとめて" },
 ];
-
-/* ──────────────────────────────────────────
-   Right sidebar data
-   ────────────────────────────────────────── */
-const NEXT_UP = [
-  { time: "10:00", title: "チームMTG", color: "var(--color-accent-bright)" },
-  { time: "14:00", title: "1on1 田中さん", color: "var(--color-amber)" },
-  { time: "16:00", title: "コードレビュー", color: "var(--color-purple)" },
-];
-
-const TODAY_TASKS = [
-  { title: "レポート提出", done: false, priority: "high" },
-  { title: "企画書レビュー", done: false, priority: "medium" },
-  { title: "MTGアジェンダ作成", done: true, priority: "high" },
-  { title: "デザインFB返信", done: false, priority: "low" },
-];
-
-const PRIORITY_COLORS: Record<string, string> = {
-  high: "var(--color-red)",
-  medium: "var(--color-amber)",
-  low: "var(--color-text-muted)",
-};
 
 /* ──────────────────────────────────────────
    Helper
@@ -272,14 +250,12 @@ export default function ChatPage() {
                         <span className="typing-dot" />
                       </div>
                     ) : msg.role === "assistant" ? (
-                      /* AI応答: Markdownレンダリング */
                       <div className="md-content">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {msg.content}
                         </ReactMarkdown>
                       </div>
                     ) : (
-                      /* ユーザー: そのまま表示（改行は保持） */
                       msg.content.split("\n").map((line, i) => (
                         <span key={i}>
                           {line}
@@ -307,6 +283,20 @@ export default function ChatPage() {
 
         {/* Quick Actions */}
         <div className="chat-quick-actions">
+          {QUICK_ACTIONS.map((action) => {
+            const Icon = action.icon;
+            return (
+              <button
+                key={action.label}
+                className="quick-action-btn"
+                onClick={() => handleQuickAction(action.prompt)}
+              >
+                <Icon size={14} />
+                <span>{action.label}</span>
+              </button>
+            );
+          })}
+
           {messages.length > 1 && (
             <button className="quick-action-btn" onClick={handleNewChat}>
               <RotateCcw size={14} />
@@ -315,16 +305,16 @@ export default function ChatPage() {
           )}
         </div>
 
-        {/* Input — textarea with Cmd/Ctrl+Enter to send */}
+        {/* Input */}
         <div className="chat-input-area">
           <div className="chat-input-wrapper">
-            <button className="chat-input-action" title="ファイルを添付">
+            <button className="chat-input-action" title="Aether">
               <Bot size={16} />
             </button>
             <textarea
               ref={textareaRef}
               className="chat-input"
-              placeholder="メッセージを入力... (Cmd/Ctrl + Enterで送信)"
+              placeholder="メッセージを入力... (Cmd/Ctrl + Enter で送信)"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
