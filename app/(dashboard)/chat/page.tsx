@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./main.css";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Send,
   Bot,
@@ -10,9 +12,9 @@ import {
   Sparkles,
   CalendarPlus,
   ListChecks,
-  ArrowRight,
   RotateCcw,
 } from "lucide-react";
+import { Roboto } from "next/font/google";
 
 /* ──────────────────────────────────────────
    Types
@@ -82,13 +84,21 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isStreaming]);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+  }, [input]);
 
   // ── Send message + stream response ──
   const handleSend = useCallback(async () => {
@@ -103,7 +113,6 @@ export default function ChatPage() {
       timestamp: timeStr,
     };
 
-    // Add user message, prepare AI placeholder
     const aiMsgId = (Date.now() + 1).toString();
     setMessages((prev) => [
       ...prev,
@@ -113,10 +122,10 @@ export default function ChatPage() {
     setInput("");
     setIsStreaming(true);
 
-    // Build messages for API (exclude welcome, send only role+content)
-    const apiMessages = [...messages.filter((m) => m.id !== "welcome"), userMsg].map(
-      ({ role, content }) => ({ role, content })
-    );
+    const apiMessages = [
+      ...messages.filter((m) => m.id !== "welcome"),
+      userMsg,
+    ].map(({ role, content }) => ({ role, content }));
 
     try {
       abortRef.current = new AbortController();
@@ -164,6 +173,24 @@ export default function ChatPage() {
                 )
               );
             }
+            if (parsed.status) {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === aiMsgId && m.content === ""
+                    ? { ...m, content: `⏳ ${parsed.status}` }
+                    : m
+                )
+              );
+              setTimeout(() => {
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === aiMsgId && m.content.startsWith("⏳")
+                      ? { ...m, content: "" }
+                      : m
+                  )
+                );
+              }, 100);
+            }
           } catch {
             // skip parse errors
           }
@@ -187,9 +214,13 @@ export default function ChatPage() {
     }
   }, [input, isStreaming, messages]);
 
-  // ── Key handler ──
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+  // ── Key handler: Enter=改行、Cmd/Ctrl+Enter=送信 ──
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (
+      e.key === "Enter" &&
+      (e.metaKey || e.ctrlKey) &&
+      !e.nativeEvent.isComposing
+    ) {
       e.preventDefault();
       handleSend();
     }
@@ -198,7 +229,7 @@ export default function ChatPage() {
   // ── Quick action ──
   const handleQuickAction = (prompt: string) => {
     setInput(prompt);
-    inputRef.current?.focus();
+    textareaRef.current?.focus();
   };
 
   // ── New conversation ──
@@ -233,14 +264,23 @@ export default function ChatPage() {
                   className={`chat-bubble ${msg.role === "user" ? "chat-bubble-user" : "chat-bubble-ai"}`}
                 >
                   <div className="chat-bubble-content">
-                    {/* ストリーミング中の空コンテンツ → typing indicator */}
-                    {msg.role === "assistant" && msg.content === "" && isStreaming ? (
+                    {msg.role === "assistant" &&
+                      msg.content === "" &&
+                      isStreaming ? (
                       <div className="typing-indicator">
                         <span className="typing-dot" />
                         <span className="typing-dot" />
                         <span className="typing-dot" />
                       </div>
+                    ) : msg.role === "assistant" ? (
+                      /* AI応答: Markdownレンダリング */
+                      <div className="md-content">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {msg.content}
+                        </ReactMarkdown>
+                      </div>
                     ) : (
+                      /* ユーザー: そのまま表示（改行は保持） */
                       msg.content.split("\n").map((line, i) => (
                         <span key={i}>
                           {line}
@@ -249,7 +289,6 @@ export default function ChatPage() {
                       ))
                     )}
                   </div>
-                  {/* タイピング中はタイムスタンプ非表示 */}
                   {!(msg.content === "" && isStreaming) && (
                     <span className="chat-time">{msg.timestamp}</span>
                   )}
@@ -269,22 +308,6 @@ export default function ChatPage() {
 
         {/* Quick Actions */}
         <div className="chat-quick-actions">
-          {QUICK_ACTIONS.map((action) => {
-            const Icon = action.icon;
-            return (
-              <button
-                key={action.label}
-                className="quick-action-btn"
-                onClick={() => handleQuickAction(action.prompt)}
-              >
-                <Icon size={14} />
-                <span>{action.label}</span>
-                <ArrowRight size={12} className="quick-action-arrow" />
-              </button>
-            );
-          })}
-
-          {/* New conversation button */}
           {messages.length > 1 && (
             <button className="quick-action-btn" onClick={handleNewChat}>
               <RotateCcw size={14} />
@@ -293,21 +316,21 @@ export default function ChatPage() {
           )}
         </div>
 
-        {/* Input */}
+        {/* Input — textarea with Cmd/Ctrl+Enter to send */}
         <div className="chat-input-area">
           <div className="chat-input-wrapper">
             <button className="chat-input-action" title="ファイルを添付">
-              <Paperclip size={16} />
+              <Bot size={16} />
             </button>
-            <input
-              ref={inputRef}
-              type="text"
+            <textarea
+              ref={textareaRef}
               className="chat-input"
-              placeholder="メッセージを入力... (Enter で送信)"
+              placeholder="メッセージを入力... (Cmd/Ctrl + Enterで送信)"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               disabled={isStreaming}
+              rows={1}
             />
             <button
               className={`chat-send-btn ${input.trim() && !isStreaming ? "active" : ""}`}
@@ -322,7 +345,6 @@ export default function ChatPage() {
 
       {/* ════════ Right Sidebar ════════ */}
       <aside className="chat-sidebar">
-        {/* Next Up */}
         <div className="chat-sidebar-card">
           <h3 className="chat-sidebar-title">Next Up</h3>
           <div className="chat-sidebar-list">
@@ -342,13 +364,14 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* Tasks */}
         <div className="chat-sidebar-card">
           <h3 className="chat-sidebar-title">Today&apos;s Tasks</h3>
           <div className="chat-sidebar-list">
             {TODAY_TASKS.map((task) => (
               <div key={task.title} className="sidebar-task-item">
-                <span className={`sidebar-task-check ${task.done ? "done" : ""}`}>
+                <span
+                  className={`sidebar-task-check ${task.done ? "done" : ""}`}
+                >
                   {task.done && (
                     <svg
                       width="10"
@@ -364,7 +387,9 @@ export default function ChatPage() {
                     </svg>
                   )}
                 </span>
-                <span className={`sidebar-task-title ${task.done ? "done" : ""}`}>
+                <span
+                  className={`sidebar-task-title ${task.done ? "done" : ""}`}
+                >
                   {task.title}
                 </span>
                 <span
@@ -376,7 +401,6 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* Connections */}
         <div className="chat-sidebar-card">
           <h3 className="chat-sidebar-title">Connections</h3>
           <div className="chat-sidebar-list">
