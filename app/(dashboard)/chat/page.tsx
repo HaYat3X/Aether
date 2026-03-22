@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import "./main.css";
 import {
   Send,
@@ -11,6 +11,7 @@ import {
   CalendarPlus,
   ListChecks,
   ArrowRight,
+  RotateCcw,
 } from "lucide-react";
 
 /* ──────────────────────────────────────────
@@ -24,30 +25,15 @@ type Message = {
 };
 
 /* ──────────────────────────────────────────
-   Initial dummy messages
+   Initial welcome message
    ────────────────────────────────────────── */
-const INITIAL_MESSAGES: Message[] = [
-  {
-    id: "1",
-    role: "assistant",
-    content:
-      "こんにちは！Aetherです。\nスケジュール管理、タスク登録、メモ作成など、なんでもお手伝いします。何をしましょうか？",
-    timestamp: "09:00",
-  },
-  {
-    id: "2",
-    role: "user",
-    content: "今日の予定を教えて",
-    timestamp: "09:01",
-  },
-  {
-    id: "3",
-    role: "assistant",
-    content:
-      "今日の予定はこちらです：\n\n• 09:00 — 朝会（30分）\n• 10:00 — チームMTG（1時間）\n• 13:00 — ランチ\n• 14:00 — 1on1 with 田中さん（30分）\n• 16:00 — コードレビュー（1時間）\n\n午前中にMTGが集中していますね。午後は比較的空いているので、集中作業におすすめです。",
-    timestamp: "09:01",
-  },
-];
+const WELCOME_MESSAGE: Message = {
+  id: "welcome",
+  role: "assistant",
+  content:
+    "こんにちは！Aetherです。\nスケジュール管理、タスク登録、メモ作成など、なんでもお手伝いします。何をしましょうか？",
+  timestamp: "—",
+};
 
 /* ──────────────────────────────────────────
    Quick actions
@@ -81,28 +67,35 @@ const PRIORITY_COLORS: Record<string, string> = {
 };
 
 /* ──────────────────────────────────────────
+   Helper
+   ────────────────────────────────────────── */
+function getTimeStr() {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+}
+
+/* ──────────────────────────────────────────
    ChatPage Component
    ────────────────────────────────────────── */
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
+  const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
-  // Auto-scroll on new message
+  // Auto-scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
+  }, [messages, isStreaming]);
 
-  // Send message handler (UI only — API integration later)
-  const handleSend = () => {
+  // ── Send message + stream response ──
+  const handleSend = useCallback(async () => {
     const text = input.trim();
-    if (!text) return;
+    if (!text || isStreaming) return;
 
-    const now = new Date();
-    const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
-
+    const timeStr = getTimeStr();
     const userMsg: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -110,33 +103,112 @@ export default function ChatPage() {
       timestamp: timeStr,
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    // Add user message, prepare AI placeholder
+    const aiMsgId = (Date.now() + 1).toString();
+    setMessages((prev) => [
+      ...prev,
+      userMsg,
+      { id: aiMsgId, role: "assistant", content: "", timestamp: timeStr },
+    ]);
     setInput("");
-    setIsTyping(true);
+    setIsStreaming(true);
 
-    // Simulate AI response (replace with real API call later)
-    setTimeout(() => {
-      const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "承知しました。対応中です…（※ここにClaude APIのレスポンスが入ります）",
-        timestamp: timeStr,
-      };
-      setMessages((prev) => [...prev, aiMsg]);
-      setIsTyping(false);
-    }, 1500);
-  };
+    // Build messages for API (exclude welcome, send only role+content)
+    const apiMessages = [...messages.filter((m) => m.id !== "welcome"), userMsg].map(
+      ({ role, content }) => ({ role, content })
+    );
 
+    try {
+      abortRef.current = new AbortController();
+
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: apiMessages }),
+        signal: abortRef.current.signal,
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "API error" }));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
+
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error("No reader");
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6);
+          if (data === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.error) throw new Error(parsed.error);
+            if (parsed.text) {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === aiMsgId
+                    ? { ...m, content: m.content + parsed.text }
+                    : m
+                )
+              );
+            }
+          } catch {
+            // skip parse errors
+          }
+        }
+      }
+    } catch (err) {
+      if ((err as Error).name === "AbortError") return;
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === aiMsgId
+            ? {
+              ...m,
+              content: `エラーが発生しました: ${(err as Error).message}\n\n.env に ANTHROPIC_API_KEY が設定されているか確認してください。`,
+            }
+            : m
+        )
+      );
+    } finally {
+      setIsStreaming(false);
+      abortRef.current = null;
+    }
+  }, [input, isStreaming, messages]);
+
+  // ── Key handler ──
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
       e.preventDefault();
       handleSend();
     }
   };
 
+  // ── Quick action ──
   const handleQuickAction = (prompt: string) => {
     setInput(prompt);
     inputRef.current?.focus();
+  };
+
+  // ── New conversation ──
+  const handleNewChat = () => {
+    if (isStreaming) {
+      abortRef.current?.abort();
+    }
+    setMessages([WELCOME_MESSAGE]);
+    setInput("");
+    setIsStreaming(false);
   };
 
   return (
@@ -151,24 +223,36 @@ export default function ChatPage() {
                 key={msg.id}
                 className={`chat-row ${msg.role === "user" ? "chat-row-user" : "chat-row-ai"}`}
               >
-                {/* Avatar */}
                 {msg.role === "assistant" && (
                   <div className="chat-avatar chat-avatar-ai">
                     <Bot size={16} />
                   </div>
                 )}
 
-                {/* Bubble */}
-                <div className={`chat-bubble ${msg.role === "user" ? "chat-bubble-user" : "chat-bubble-ai"}`}>
+                <div
+                  className={`chat-bubble ${msg.role === "user" ? "chat-bubble-user" : "chat-bubble-ai"}`}
+                >
                   <div className="chat-bubble-content">
-                    {msg.content.split("\n").map((line, i) => (
-                      <span key={i}>
-                        {line}
-                        {i < msg.content.split("\n").length - 1 && <br />}
-                      </span>
-                    ))}
+                    {/* ストリーミング中の空コンテンツ → typing indicator */}
+                    {msg.role === "assistant" && msg.content === "" && isStreaming ? (
+                      <div className="typing-indicator">
+                        <span className="typing-dot" />
+                        <span className="typing-dot" />
+                        <span className="typing-dot" />
+                      </div>
+                    ) : (
+                      msg.content.split("\n").map((line, i) => (
+                        <span key={i}>
+                          {line}
+                          {i < msg.content.split("\n").length - 1 && <br />}
+                        </span>
+                      ))
+                    )}
                   </div>
-                  <span className="chat-time">{msg.timestamp}</span>
+                  {/* タイピング中はタイムスタンプ非表示 */}
+                  {!(msg.content === "" && isStreaming) && (
+                    <span className="chat-time">{msg.timestamp}</span>
+                  )}
                 </div>
 
                 {msg.role === "user" && (
@@ -178,22 +262,6 @@ export default function ChatPage() {
                 )}
               </div>
             ))}
-
-            {/* Typing indicator */}
-            {isTyping && (
-              <div className="chat-row chat-row-ai">
-                <div className="chat-avatar chat-avatar-ai">
-                  <Bot size={16} />
-                </div>
-                <div className="chat-bubble chat-bubble-ai">
-                  <div className="typing-indicator">
-                    <span className="typing-dot" />
-                    <span className="typing-dot" />
-                    <span className="typing-dot" />
-                  </div>
-                </div>
-              </div>
-            )}
 
             <div ref={messagesEndRef} />
           </div>
@@ -215,6 +283,14 @@ export default function ChatPage() {
               </button>
             );
           })}
+
+          {/* New conversation button */}
+          {messages.length > 1 && (
+            <button className="quick-action-btn" onClick={handleNewChat}>
+              <RotateCcw size={14} />
+              <span>新しい会話</span>
+            </button>
+          )}
         </div>
 
         {/* Input */}
@@ -231,11 +307,12 @@ export default function ChatPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
+              disabled={isStreaming}
             />
             <button
-              className={`chat-send-btn ${input.trim() ? "active" : ""}`}
+              className={`chat-send-btn ${input.trim() && !isStreaming ? "active" : ""}`}
               onClick={handleSend}
-              disabled={!input.trim()}
+              disabled={!input.trim() || isStreaming}
             >
               <Send size={16} />
             </button>
@@ -253,7 +330,10 @@ export default function ChatPage() {
               <div key={item.time} className="sidebar-schedule-item">
                 <span
                   className="sidebar-schedule-dot"
-                  style={{ background: item.color, boxShadow: `0 0 6px ${item.color}40` }}
+                  style={{
+                    background: item.color,
+                    boxShadow: `0 0 6px ${item.color}40`,
+                  }}
                 />
                 <span className="sidebar-schedule-time">{item.time}</span>
                 <span className="sidebar-schedule-title">{item.title}</span>
@@ -268,11 +348,18 @@ export default function ChatPage() {
           <div className="chat-sidebar-list">
             {TODAY_TASKS.map((task) => (
               <div key={task.title} className="sidebar-task-item">
-                <span
-                  className={`sidebar-task-check ${task.done ? "done" : ""}`}
-                >
+                <span className={`sidebar-task-check ${task.done ? "done" : ""}`}>
                   {task.done && (
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   )}
@@ -289,7 +376,7 @@ export default function ChatPage() {
           </div>
         </div>
 
-        {/* Connection Status */}
+        {/* Connections */}
         <div className="chat-sidebar-card">
           <h3 className="chat-sidebar-title">Connections</h3>
           <div className="chat-sidebar-list">
