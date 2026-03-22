@@ -1,0 +1,59 @@
+# ============================================
+# Anthropic API
+# ============================================
+# Claude API の認証キー
+ANTHROPIC_API_KEY=
+
+# ============================================
+# Notion API
+# ============================================
+# Notion インテグレーションの認証トークン
+NOTION_API_KEY=
+
+# --- データベース ID (DB_ID) ---
+# タスク管理DB
+NOTION_TASK_DB_ID=
+# デイリーログDB
+NOTION_DAILY_DB_ID=
+# スクラップ（メモ・断片）DB
+NOTION_SCRAP_DB_ID=
+# スプリント管理DB
+NOTION_SPRINT_DB_ID=
+# ナレッジベースDB
+NOTION_KNOWLEDGE_DB_ID=
+# レビューDB
+NOTION_REVIEW_DB_ID=
+# OKR（目標と主要成果）DB
+NOTION_OKR_DB_ID=
+# KR（主要成果）DB
+NOTION_KR_DB_ID=
+
+# --- データソース ID (DS_ID) ---
+# タスク管理データソース
+NOTION_TASK_DS_ID=
+# デイリーログデータソース
+NOTION_DAILY_DS_ID=
+# スクラップデータソース
+NOTION_SCRAP_DS_ID=
+# スプリントデータソース
+NOTION_SPRINT_DS_ID=
+# ナレッジベースデータソース
+NOTION_KNOWLEDGE_DS_ID=
+# レビューデータソース
+NOTION_REVIEW_DS_ID=
+# OKRデータソース
+NOTION_OKR_DS_ID=
+# KRデータソース
+NOTION_KR_DS_ID=
+
+# ============================================
+# Google Cloud サービスアカウント
+# ============================================
+# サービスアカウントのメールアドレス（API認証に使用）
+GOOGLE_SERVICE_ACCOUNT_EMAIL=
+
+# ============================================
+# Google Calendar
+# ============================================
+# 連携対象のカレンダーID（実際のカレンダーIDに置き換えてください）
+GOOGLE_CALENDAR_ID=
