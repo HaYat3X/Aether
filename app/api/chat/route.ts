@@ -7,7 +7,8 @@ import { executeTool } from "./notion";
    Config
    ────────────────────────────────────────── */
 const MAX_CONTEXT_MESSAGES = 10;
-const MODEL = "claude-sonnet-4-20250514";
+// const MODEL = "claude-sonnet-4-20250514";
+const MODEL = "claude-haiku-4-5-20251001";
 
 const SYSTEM_PROMPT = `あなたは「Aether」という名前のAI秘書です。
 ユーザーの個人的なスケジュール管理・タスク管理・メモ作成をサポートしつつ、

@@ -5,8 +5,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import {
-  MessageSquare,
-  Calendar,
   CheckSquare,
   Clock,
   BookOpen,
@@ -14,6 +12,11 @@ import {
   ChevronRight,
   Blocks,
   Bot,
+  Sun,
+  Gamepad2,
+  Target,
+  Flag,
+  CalendarCheck
 } from "lucide-react";
 import clsx from "clsx";
 
@@ -36,21 +39,40 @@ const MAIN_NAV: NavItem[] = [
     label: "AI Assistant",
   },
   {
-    href: "/schedule",
-    icon: Calendar,
-    label: "Schedule",
-    children: [
-      { href: "/schedule", label: "Weekly" },
-      { href: "/schedule/daily", label: "Daily" },
-    ],
-  },
-  {
     href: "/tasks",
     icon: CheckSquare,
     label: "Tasks",
   },
   { href: "/daily", icon: Clock, label: "Daily Plan" },
   { href: "/scraps", icon: BookOpen, label: "Scraps" },
+];
+
+const SERVICE_NAV: NavItem[] = [
+  {
+    href: "https://claude.ai/",
+    icon: Sun,
+    label: "claude.ai",
+  },
+  {
+    href: "https://calendar.google.com/calendar/u/0/r",
+    icon: CalendarCheck,
+    label: "Google カレンダー",
+  },
+  {
+    href: "https://www.notion.so/2cffab19d29580259d19c77e884147e5?source=copy_link",
+    icon: Gamepad2,
+    label: "とげのポータル",
+  },
+  {
+    href: "https://www.notion.so/31cfab19d29580f6a60be2f48fe220b1?source=copy_link",
+    icon: Flag,
+    label: "目標管理ポータル",
+  },
+  {
+    href: "https://www.notion.so/325fab19d29580dfaf52fad46b92629f?source=copy_link",
+    icon: Target,
+    label: "プロジェクトポータル",
+  },
 ];
 
 const SYSTEM_NAV: NavItem[] = [
@@ -63,7 +85,7 @@ const SYSTEM_NAV: NavItem[] = [
    ────────────────────────────────────────── */
 export default function Sidebar() {
   const pathname = usePathname();
-  const [expanded, setExpanded] = useState<string | null>("/schedule");
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   const isActive = (href: string) =>
     pathname === href || pathname?.startsWith(href + "/");
@@ -107,6 +129,15 @@ export default function Sidebar() {
         onToggle={toggleExpand}
       />
 
+      {/* ── Service Nav ── */}
+      <NavSection
+        label="Other Service"
+        items={SERVICE_NAV}
+        isActive={isActive}
+        expanded={expanded}
+        onToggle={toggleExpand}
+      />
+
       {/* Spacer */}
       <div className="flex-1" />
 
@@ -141,6 +172,8 @@ function NavSection({
   expanded: string | null;
   onToggle: (href: string) => void;
 }) {
+  const isExternal = (href: string) => href.startsWith("http");
+
   return (
     <div className="nav-section">
       <div className="nav-section-label">{label}</div>
@@ -172,6 +205,19 @@ function NavSection({
                   <ChevronRight size={14} />
                 </span>
               </button>
+            ) : isExternal(item.href) ? (
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-item"
+              >
+                <Icon size={18} />
+                <span className="nav-label">{item.label}</span>
+                {item.badge && (
+                  <span className="nav-badge">{item.badge}</span>
+                )}
+              </a>
             ) : (
               <Link
                 href={item.href}
