@@ -57,3 +57,8 @@ GOOGLE_SERVICE_ACCOUNT_EMAIL=
 # ============================================
 # 連携対象のカレンダーID（実際のカレンダーIDに置き換えてください）
 GOOGLE_CALENDAR_ID=
+
+# ============================================
+# Google Service Account Key
+# ============================================
+GOOGLE_SERVICE_ACCOUNT_KEY=

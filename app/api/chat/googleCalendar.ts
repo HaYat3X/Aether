@@ -1,15 +1,24 @@
 import { google, calendar_v3 } from "googleapis";
-import path from "path";
 
 /* ──────────────────────────────────────────
    Google Calendar Client (Service Account)
-   GoogleAuth 方式 — キーファイルを直接指定
+   環境変数から credentials を読み込む方式
+   ── Vercel デプロイ対応 ──
    ────────────────────────────────────────── */
 function getCalendarClient(): calendar_v3.Calendar {
-  const keyFilePath = path.join(process.cwd(), "google-service-account.json");
+  const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+
+  if (!serviceAccountKey) {
+    throw new Error(
+      "環境変数 GOOGLE_SERVICE_ACCOUNT_KEY が設定されていません。" +
+        "Vercel の Settings → Environment Variables に google-service-account.json の中身を登録してください。"
+    );
+  }
+
+  const credentials = JSON.parse(serviceAccountKey);
 
   const auth = new google.auth.GoogleAuth({
-    keyFile: keyFilePath,
+    credentials,
     scopes: ["https://www.googleapis.com/auth/calendar"],
   });
 
@@ -44,8 +53,13 @@ export async function getEvents(input: GetEventsInput) {
   // デバッグ: サービスアカウントから見えるカレンダー一覧
   try {
     const calList = await calendar.calendarList.list();
-    console.log("[GCal Debug] Accessible calendars:", 
-      calList.data.items?.map(c => ({ id: c.id, summary: c.summary, accessRole: c.accessRole }))
+    console.log(
+      "[GCal Debug] Accessible calendars:",
+      calList.data.items?.map((c) => ({
+        id: c.id,
+        summary: c.summary,
+        accessRole: c.accessRole,
+      }))
     );
   } catch (e) {
     console.log("[GCal Debug] calendarList error:", (e as Error).message);
