@@ -188,7 +188,7 @@ export async function POST(req: NextRequest) {
 
           // Find tool_use blocks
           const toolUseBlocks = assistantContent.filter(
-            (b): b is Anthropic.ContentBlockParam & {
+            (b): b is Anthropic.ToolUseBlock & {
               type: "tool_use";
               id: string;
               name: string;
