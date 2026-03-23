@@ -1,0 +1,310 @@
+/* ============================================
+   Tasks Page — Kanban Board View
+   ============================================ */
+
+/* ── Page header row ── */
+
+.tasks-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tasks-total-badge {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 7px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.tasks-refresh-btn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 13px;
+  border-radius: 9px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.tasks-refresh-btn:hover {
+  border-color: var(--color-border-accent);
+  color: var(--color-accent-bright);
+  background: var(--color-accent-glow-subtle);
+}
+
+/* ── Loading / Error ── */
+
+.tasks-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 20px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+@keyframes tspin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.tasks-spinner {
+  animation: tspin 1s linear infinite;
+  color: var(--color-accent-bright);
+}
+
+.tasks-error {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: rgba(248, 113, 113, 0.06);
+  border: 1px solid rgba(248, 113, 113, 0.12);
+  color: var(--color-red);
+  font-size: 13px;
+}
+
+.tasks-retry-btn {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  background: transparent;
+  color: var(--color-red);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+
+.tasks-retry-btn:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* ── Board layout ── */
+
+.tasks-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .tasks-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .tasks-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Column ── */
+
+.tasks-col {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: fadeUp 0.45s ease-out both;
+}
+
+.tasks-col:nth-child(1) { animation-delay: 0ms; }
+.tasks-col:nth-child(2) { animation-delay: 60ms; }
+.tasks-col:nth-child(3) { animation-delay: 120ms; }
+.tasks-col:nth-child(4) { animation-delay: 180ms; }
+
+/* Column header */
+.tasks-col-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px 11px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tasks-col-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tasks-col-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.tasks-col-count {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+/* Cards area */
+.tasks-col-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 10px 12px;
+  min-height: 48px;
+}
+
+.tasks-col-empty {
+  padding: 16px 12px;
+  font-size: 11px;
+  color: var(--color-text-dim);
+  text-align: center;
+}
+
+/* ── Column color themes ── */
+
+.tasks-col.col-todo .tasks-col-dot   { background: var(--color-text-muted); }
+.tasks-col.col-todo .tasks-col-title { color: var(--color-text-muted); }
+
+.tasks-col.col-inprogress              { border-color: rgba(59, 130, 246, 0.12); }
+.tasks-col.col-inprogress .tasks-col-dot   { background: var(--color-accent); box-shadow: 0 0 6px var(--color-accent-glow-sm); }
+.tasks-col.col-inprogress .tasks-col-title { color: var(--color-accent-bright); }
+
+.tasks-col.col-done .tasks-col-dot   { background: var(--color-green); box-shadow: 0 0 6px rgba(52, 211, 153, 0.35); }
+.tasks-col.col-done .tasks-col-title { color: var(--color-green); }
+
+.tasks-col.col-hold .tasks-col-dot   { background: var(--color-purple); box-shadow: 0 0 6px rgba(167, 139, 250, 0.35); }
+.tasks-col.col-hold .tasks-col-title { color: var(--color-purple); }
+
+/* ── Task Card ── */
+
+.tasks-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 11px;
+  padding: 11px 12px 11px 15px;
+  cursor: default;
+  transition: border-color 0.18s ease, transform 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tasks-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+}
+
+.tasks-card:hover {
+  border-color: var(--color-border-hover);
+  transform: translateY(-1px);
+}
+
+/* Priority left-bar */
+.tasks-card.prio-highest::before { background: var(--color-red);    box-shadow: 2px 0 8px rgba(248, 113, 113, 0.4); }
+.tasks-card.prio-high::before    { background: var(--color-amber);  box-shadow: 2px 0 8px rgba(251, 191, 36, 0.4); }
+.tasks-card.prio-medium::before  { background: var(--color-accent); box-shadow: 2px 0 8px rgba(59, 130, 246, 0.35); }
+.tasks-card.prio-low::before     { background: var(--color-purple); box-shadow: 2px 0 8px rgba(167, 139, 250, 0.35); }
+.tasks-card.prio-lowest::before  { background: var(--color-text-dim); }
+
+/* Card title */
+.tasks-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.45;
+  margin-bottom: 7px;
+  word-break: break-word;
+}
+
+.tasks-card-title.is-done {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--color-text-muted);
+}
+
+/* Summary */
+.tasks-card-summary {
+  font-size: 11.5px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin-bottom: 9px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Meta row */
+.tasks-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* Badge base */
+.tasks-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+/* Priority badges */
+.badge-prio-highest { background: rgba(248, 113, 113, 0.12); color: var(--color-red); }
+.badge-prio-high    { background: rgba(251, 191, 36,  0.12); color: var(--color-amber); }
+.badge-prio-medium  { background: rgba(59,  130, 246, 0.10); color: var(--color-accent-bright); }
+.badge-prio-low     { background: rgba(167, 139, 250, 0.12); color: var(--color-purple); }
+.badge-prio-lowest  { background: rgba(255, 255, 255, 0.04); color: var(--color-text-muted); }
+
+/* Category badges */
+.badge-cat-goal    { background: rgba(59,  130, 246, 0.10); color: var(--color-accent-bright); }
+.badge-cat-routine { background: rgba(251, 191, 36,  0.10); color: var(--color-amber); }
+.badge-cat-project { background: rgba(248, 113, 113, 0.10); color: var(--color-red); }
+.badge-cat-adhoc   { background: rgba(167, 139, 250, 0.10); color: var(--color-purple); }
+.badge-cat-misc    { background: rgba(255, 255, 255, 0.04); color: var(--color-text-muted); }
+
+/* Hours badge */
+.badge-hours {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+}
