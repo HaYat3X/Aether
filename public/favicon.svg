@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <style>
+    .bg { fill: #060b17; }
+    .mark { fill: none; stroke: #ffffff; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+    @media (prefers-color-scheme: light) {
+      .bg { fill: #f8faff; }
+      .mark { stroke: #0f172a; }
+    }
+  </style>
+  <rect width="100" height="100" rx="22" class="bg"/>
+  <!-- Stylized A with tail -->
+  <path class="mark" d="M22 72 L50 22 L78 72"/>
+  <line class="mark" x1="33" y1="52" x2="67" y2="52"/>
+  <path class="mark" d="M63 72 Q82 68 82 50 Q82 34 68 28"/>
+</svg>

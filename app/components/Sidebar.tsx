@@ -104,7 +104,11 @@ export default function Sidebar() {
       <div className="sidebar-brand">
         <Link href="/chat" className="brand-icon">
           <Image
-            src="/img/aether_icon_512.png"
+            src={
+              theme === "dark"
+                ? "/aether_icon_dark_512.png" // ダークモード: 白ロゴ
+                : "/aether_icon_light_512.png" // ライトモード: 黒ロゴ
+            }
             alt="Aether"
             width={36}
             height={36}
