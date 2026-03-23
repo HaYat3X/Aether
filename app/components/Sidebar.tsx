@@ -16,9 +16,11 @@ import {
   Gamepad2,
   Target,
   Flag,
-  CalendarCheck
+  CalendarCheck,
+  Moon,
 } from "lucide-react";
 import clsx from "clsx";
+import { useTheme } from "./ThemeProvider";
 
 /* ──────────────────────────────────────────
    Nav definitions
@@ -93,6 +95,9 @@ export default function Sidebar() {
   const toggleExpand = (href: string) =>
     setExpanded((prev) => (prev === href ? null : href));
 
+  // Sidebar コンポーネント内
+  const { theme, toggle } = useTheme();
+
   return (
     <aside className="sidebar">
       {/* ── Brand ── */}
@@ -145,6 +150,14 @@ export default function Sidebar() {
       <div className="sidebar-divider" />
 
       {/* ── User ── */}
+      <div className="nav-section">
+        <button className="nav-item" onClick={toggle}>
+          {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          <span className="nav-label">
+            {theme === "dark" ? "ライトモード" : "ダークモード"}
+          </span>
+        </button>
+      </div>
       <div className="sidebar-user">
         <div className="user-avatar">H</div>
         <div className="user-info">
@@ -193,14 +206,12 @@ function NavSection({
                 className={clsx(
                   "nav-item nav-parent",
                   active && "active",
-                  isExpanded && "expanded"
+                  isExpanded && "expanded",
                 )}
               >
                 <Icon size={18} />
                 <span className="nav-label">{item.label}</span>
-                {item.badge && (
-                  <span className="nav-badge">{item.badge}</span>
-                )}
+                {item.badge && <span className="nav-badge">{item.badge}</span>}
                 <span className="nav-chevron">
                   <ChevronRight size={14} />
                 </span>
@@ -214,9 +225,7 @@ function NavSection({
               >
                 <Icon size={18} />
                 <span className="nav-label">{item.label}</span>
-                {item.badge && (
-                  <span className="nav-badge">{item.badge}</span>
-                )}
+                {item.badge && <span className="nav-badge">{item.badge}</span>}
               </a>
             ) : (
               <Link
@@ -225,9 +234,7 @@ function NavSection({
               >
                 <Icon size={18} />
                 <span className="nav-label">{item.label}</span>
-                {item.badge && (
-                  <span className="nav-badge">{item.badge}</span>
-                )}
+                {item.badge && <span className="nav-badge">{item.badge}</span>}
               </Link>
             )}
 
@@ -240,7 +247,7 @@ function NavSection({
                     href={child.href}
                     className={clsx(
                       "nav-item",
-                      isActive(child.href) && "active"
+                      isActive(child.href) && "active",
                     )}
                   >
                     <span className="sub-dot" />

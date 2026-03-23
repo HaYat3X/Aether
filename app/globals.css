@@ -48,11 +48,79 @@
 }
 
 /* ============================================
-   Base Styles
+   Light Mode Overrides
    ============================================ */
 
-html {
+[data-theme="light"] {
+  --color-bg-base: #f0f4ff;
+  --color-bg-sidebar: #e8eef8;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #f5f8ff;
+  --color-bg-input: #ffffff;
+  --color-bg-hover: #e2e9f5;
+
+  --color-glass: rgba(255, 255, 255, 0.7);
+  --color-glass-border: rgba(0, 0, 0, 0.06);
+
+  --color-accent: #2563eb;
+  --color-accent-bright: #1d4ed8;
+  --color-accent-dim: #3b82f6;
+  --color-accent-glow: rgba(37, 99, 235, 0.2);
+  --color-accent-glow-sm: rgba(37, 99, 235, 0.1);
+  --color-accent-glow-subtle: rgba(37, 99, 235, 0.06);
+
+  --color-purple: #7c3aed;
+  --color-green: #059669;
+  --color-amber: #d97706;
+  --color-pink: #db2777;
+  --color-red: #dc2626;
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  --color-text-dim: #94a3b8;
+
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-hover: rgba(0, 0, 0, 0.12);
+  --color-border-accent: rgba(37, 99, 235, 0.2);
+}
+
+/* ライトモード時の body 背景 */
+[data-theme="light"] body {
+  background-color: var(--color-bg-base);
+}
+
+/* ライトモード時のサイドバー微調整 */
+[data-theme="light"] .sidebar {
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.06);
+}
+
+/* ライトモード時のグラスカード */
+[data-theme="light"] .glass-card {
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+/* ライトモード時のスクロールバー */
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+/* ダークモード（デフォルト） */
+html,
+html[data-theme="dark"] {
   color-scheme: dark;
+}
+
+/* ライトモード */
+html[data-theme="light"] {
+  color-scheme: light;
 }
 
 body {
