@@ -18,6 +18,7 @@ import {
   Flag,
   CalendarCheck,
   Moon,
+  TrendingUp
 } from "lucide-react";
 import clsx from "clsx";
 import { useTheme } from "./ThemeProvider";
@@ -47,6 +48,7 @@ const MAIN_NAV: NavItem[] = [
   },
   { href: "/daily", icon: Clock, label: "Daily Plan" },
   { href: "/scraps", icon: BookOpen, label: "Scraps" },
+  { href: "/trends", icon: TrendingUp, label: "Trend" },
 ];
 
 const SERVICE_NAV: NavItem[] = [
