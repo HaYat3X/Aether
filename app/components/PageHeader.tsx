@@ -9,7 +9,7 @@ import {
   Clock,
   BookOpen,
   Settings,
-  Bell,
+  TrendingUp,
   Blocks,
   Bot,
 } from "lucide-react";
@@ -26,6 +26,7 @@ const PAGE_META: Record<string, PageMeta> = {
   "/tasks": { title: "Tasks", subtitle: "タスク管理", icon: CheckSquare },
   "/daily": { title: "Daily Plan", subtitle: "今日のプラン", icon: Clock },
   "/scraps": { title: "Scraps", subtitle: "アイデアメモ", icon: BookOpen },
+  "/trends": { title: "Trends", subtitle: "トレンド", icon: TrendingUp },
   "/settings": { title: "Settings", subtitle: "設定", icon: Settings },
   "/integrations": { title: "Integrations", subtitle: "外部サービス連携", icon: Blocks },
 };

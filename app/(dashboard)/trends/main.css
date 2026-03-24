@@ -1,0 +1,734 @@
+/* ============================================
+   Trend Page — Editorial Intelligence Feed
+   ============================================ */
+
+/* ── Header ── */
+
+.trend-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.trend-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trend-last-updated {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.trend-last-updated-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-green);
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+  flex-shrink: 0;
+}
+
+.trend-cache-badge {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 5px;
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.18);
+  color: var(--color-amber);
+}
+
+.trend-freshbadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.18);
+  color: var(--color-green);
+}
+
+.trend-force-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.trend-force-btn:hover:not(:disabled) {
+  border-color: var(--color-amber);
+  color: var(--color-amber);
+  background: rgba(251, 191, 36, 0.06);
+}
+
+.trend-force-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.trend-last-updated-dot.stale {
+  background: var(--color-amber);
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.4);
+}
+
+.trend-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.trend-fetch-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.trend-fetch-btn:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent-bright);
+  background: var(--color-accent-glow-subtle);
+}
+
+.trend-fetch-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.trend-fetch-btn.fetching {
+  border-color: var(--color-accent);
+  color: var(--color-accent-bright);
+  background: var(--color-accent-glow-subtle);
+}
+
+/* ── Category Filter ── */
+
+.trend-filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.trend-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.trend-filter-btn:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text-secondary);
+}
+
+.trend-filter-btn.active {
+  border-color: var(--color-border-accent);
+  color: var(--color-accent-bright);
+  background: var(--color-accent-glow-subtle);
+}
+
+.trend-filter-count {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+.trend-filter-btn.active .trend-filter-count {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.2);
+  color: var(--color-accent-bright);
+}
+
+/* ── Loading ── */
+
+.trend-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.trend-loading-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--color-accent-glow-subtle);
+  border: 1px solid rgba(59, 130, 246, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-bright);
+}
+
+@keyframes trend-pulse {
+
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.95);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.trend-loading-icon {
+  animation: trend-pulse 1.8s ease-in-out infinite;
+}
+
+.trend-loading-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.trend-loading-desc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+.trend-loading-progress {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.trend-loading-step {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+.trend-loading-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--color-accent-bright);
+  border-radius: 2px;
+  animation: blink 1s ease-in-out infinite;
+}
+
+/* ── Error ── */
+
+.trend-error {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: rgba(248, 113, 113, 0.06);
+  border: 1px solid rgba(248, 113, 113, 0.12);
+  color: var(--color-red);
+}
+
+.trend-error-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.trend-error-detail {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.trend-retry-btn {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  background: transparent;
+  color: var(--color-red);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+
+.trend-retry-btn:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* ── Empty State ── */
+
+.trend-empty {
+  text-align: center;
+  padding: 64px 20px;
+}
+
+.trend-empty-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--color-accent-glow-subtle);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-bright);
+  margin-bottom: 16px;
+}
+
+.trend-empty-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.trend-empty-desc {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+/* ── Featured (Top Item) ── */
+
+.trend-featured {
+  position: relative;
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+  animation: fadeUp 0.45s ease-out both;
+}
+
+.trend-featured::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      var(--color-accent) 40%,
+      var(--color-accent-bright) 60%,
+      transparent 100%);
+  opacity: 0.5;
+}
+
+.trend-featured:hover {
+  border-color: var(--color-border-hover);
+}
+
+.trend-featured-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-accent-bright);
+  margin-bottom: 12px;
+}
+
+.trend-featured-label::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent-glow-sm);
+}
+
+.trend-featured-title {
+  font-family: var(--font-heading), "Outfit", sans-serif;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+
+.trend-featured-summary {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+  max-width: 800px;
+}
+
+.trend-featured-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Grid ── */
+
+.trend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 14px;
+}
+
+/* ── Card ── */
+
+.trend-card {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s ease;
+  animation: fadeUp 0.45s ease-out both;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+
+.trend-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.trend-card:hover {
+  border-color: var(--color-border-hover);
+  background: rgba(8, 14, 28, 0.65);
+  transform: translateY(-1px);
+}
+
+.trend-card:hover::before {
+  opacity: 1;
+}
+
+/* Category left-border colors */
+.trend-card.cat-ai::before {
+  background: var(--color-accent);
+  box-shadow: 2px 0 8px rgba(59, 130, 246, 0.4);
+}
+
+.trend-card.cat-tech::before {
+  background: var(--color-purple);
+  box-shadow: 2px 0 8px rgba(167, 139, 250, 0.4);
+}
+
+.trend-card.cat-business::before {
+  background: var(--color-amber);
+  box-shadow: 2px 0 8px rgba(251, 191, 36, 0.4);
+}
+
+.trend-card.cat-science::before {
+  background: var(--color-green);
+  box-shadow: 2px 0 8px rgba(52, 211, 153, 0.4);
+}
+
+.trend-card.cat-world::before {
+  background: var(--color-pink);
+  box-shadow: 2px 0 8px rgba(244, 114, 182, 0.4);
+}
+
+.trend-card.cat-other::before {
+  background: var(--color-text-muted);
+}
+
+/* Card header */
+.trend-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.trend-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.45;
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+
+.trend-impact-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.trend-impact-score.score-high {
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--color-red);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+}
+
+.trend-impact-score.score-medium {
+  background: rgba(251, 191, 36, 0.10);
+  color: var(--color-amber);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.trend-impact-score.score-low {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+/* Card summary */
+.trend-card-summary {
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+}
+
+/* Card footer */
+.trend-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* Badges */
+.trend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 5px;
+  white-space: nowrap;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+.trend-badge-ai {
+  background: rgba(59, 130, 246, 0.10);
+  color: var(--color-accent-bright);
+}
+
+.trend-badge-tech {
+  background: rgba(167, 139, 250, 0.10);
+  color: var(--color-purple);
+}
+
+.trend-badge-business {
+  background: rgba(251, 191, 36, 0.10);
+  color: var(--color-amber);
+}
+
+.trend-badge-science {
+  background: rgba(52, 211, 153, 0.10);
+  color: var(--color-green);
+}
+
+.trend-badge-world {
+  background: rgba(244, 114, 182, 0.10);
+  color: var(--color-pink);
+}
+
+.trend-badge-other {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text-muted);
+}
+
+.trend-badge-keyword {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+/* ── Summary Section (AI Digest) ── */
+
+.trend-digest {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  animation: fadeUp 0.45s ease-out both;
+  animation-delay: 60ms;
+}
+
+.trend-digest-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.trend-digest-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--color-accent-glow-subtle);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-bright);
+  flex-shrink: 0;
+}
+
+.trend-digest-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.trend-digest-body {
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--color-text-secondary);
+}
+
+/* ── Stagger animation delays ── */
+
+.trend-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.trend-card:nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.trend-card:nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.trend-card:nth-child(4) {
+  animation-delay: 120ms;
+}
+
+.trend-card:nth-child(5) {
+  animation-delay: 160ms;
+}
+
+.trend-card:nth-child(6) {
+  animation-delay: 200ms;
+}
+
+.trend-card:nth-child(7) {
+  animation-delay: 240ms;
+}
+
+.trend-card:nth-child(8) {
+  animation-delay: 280ms;
+}
+
+.trend-card:nth-child(9) {
+  animation-delay: 320ms;
+}
+
+.trend-card:nth-child(10) {
+  animation-delay: 360ms;
+}
+
+.trend-card:nth-child(11) {
+  animation-delay: 400ms;
+}
+
+.trend-card:nth-child(12) {
+  animation-delay: 440ms;
+}
+
+/* ── Spin animation for refresh icon ── */
+
+@keyframes trend-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.trend-spinning {
+  animation: trend-spin 1s linear infinite;
+}
