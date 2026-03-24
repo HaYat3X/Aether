@@ -48,6 +48,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
+      data-theme="light"
       className={`${outfit.variable} ${jetbrainsMono.variable} ${notoSansJP.variable}`}
     >
       <body className="min-h-dvh overflow-hidden">
