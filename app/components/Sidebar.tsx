@@ -106,15 +106,15 @@ export default function Sidebar() {
       <div className="sidebar-brand">
         <Link href="/chat" className="brand-icon">
           <Image
-            src="/test.png"
-            alt="Aether"
+            src="/lumo_icon_512.png"
+            alt="Lumo"
             width={36}
             height={36}
             className="rounded-[10px]"
           />
         </Link>
         <Link href="/chat" className="brand-name">
-          Aether
+          Lumo
         </Link>
       </div>
 
