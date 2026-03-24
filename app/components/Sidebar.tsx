@@ -155,6 +155,7 @@ export default function Sidebar() {
         <div className="user-avatar">H</div>
         <div className="user-info">
           <div className="user-name">Hayate Takeda</div>
+          <div className="user-email">hayatetakeda48@gmail.com</div>
         </div>
         <div className="user-status" />
       </div>

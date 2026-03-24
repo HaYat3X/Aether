@@ -747,6 +747,12 @@ body {
   text-overflow: ellipsis;
 }
 
+.user-email {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 1px;
+}
+
 .user-sub {
   font-size: 11px;
   color: var(--color-accent-bright);
