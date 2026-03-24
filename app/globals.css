@@ -753,12 +753,6 @@ body {
   margin-top: 1px;
 }
 
-.user-sub {
-  font-size: 11px;
-  color: var(--color-accent-bright);
-  margin-top: 1px;
-}
-
 .user-status {
   width: 8px;
   height: 8px;
@@ -898,4 +892,3 @@ body {
 [data-theme="light"] .typing-dot {
   background: var(--color-text-muted);
 }
-
