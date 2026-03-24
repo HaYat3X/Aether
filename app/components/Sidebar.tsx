@@ -127,19 +127,19 @@ export default function Sidebar() {
         onToggle={toggleExpand}
       />
 
-      {/* ── System Nav ── */}
+      {/* ── Service Nav ── */}
       <NavSection
-        label="System"
-        items={SYSTEM_NAV}
+        label="Other Service"
+        items={SERVICE_NAV}
         isActive={isActive}
         expanded={expanded}
         onToggle={toggleExpand}
       />
 
-      {/* ── Service Nav ── */}
+      {/* ── System Nav ── */}
       <NavSection
-        label="Other Service"
-        items={SERVICE_NAV}
+        label="System"
+        items={SYSTEM_NAV}
         isActive={isActive}
         expanded={expanded}
         onToggle={toggleExpand}
@@ -151,19 +151,11 @@ export default function Sidebar() {
       {/* ── Divider ── */}
       <div className="sidebar-divider" />
 
-      {/* ── User ── */}
-      <div className="nav-section">
-        <button className="nav-item" onClick={toggle}>
-          {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          <span className="nav-label">
-            {theme === "dark" ? "ライトモード" : "ダークモード"}
-          </span>
-        </button>
-      </div>
       <div className="sidebar-user">
         <div className="user-avatar">H</div>
         <div className="user-info">
           <div className="user-name">Hayate Takeda</div>
+          <div className="user-email">hayatetakeda48@gmail.com</div>
         </div>
         <div className="user-status" />
       </div>

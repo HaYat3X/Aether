@@ -14,8 +14,7 @@ export default function DashboardLayout({
       <main
         className="ml-[260px] flex flex-1 flex-col overflow-hidden"
         style={{
-          background:
-            "radial-gradient(ellipse 60% 50% at 50% 0%, rgba(59,130,246,0.03) 0%, transparent 60%)",
+          background: "var(--color-bg-base)",
         }}
       >
         {/* Fixed header */}
