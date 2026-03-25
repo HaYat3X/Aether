@@ -62,3 +62,12 @@ GOOGLE_CALENDAR_ID=
 # Google Service Account Key
 # ============================================
 GOOGLE_SERVICE_ACCOUNT_KEY=
+
+# ============================================
+# Google OAuth
+# ============================================
+#  npx auth secretで生成
+BETTER_AUTH_SECRET=
+# CloudConsleっで生成
+AUTH_GOOGLE_ID=
+AUTH_GOOGLE_SECRET=
