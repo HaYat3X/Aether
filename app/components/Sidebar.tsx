@@ -109,7 +109,7 @@ export default function Sidebar({ user }: { user: SidebarUser | null }) {
       <div className="sidebar-brand">
         <Link href="/chat" className="brand-icon">
           <Image
-            src="/lumo_icon_512.png"
+            src="/login.png"
             alt="Lumo"
             width={36}
             height={36}

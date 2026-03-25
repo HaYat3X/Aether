@@ -13,6 +13,7 @@ import {
   ListChecks,
   RotateCcw,
 } from "lucide-react";
+import Image from "next/image";
 
 /* ──────────────────────────────────────────
    Types
@@ -32,7 +33,7 @@ const WELCOME_MESSAGE: Message = {
   id: "welcome",
   role: "assistant",
   content:
-    "こんにちは！**Aether**です。\n\nスケジュール管理、タスク登録、メモ作成など、なんでもお手伝いします。\n\n何をしましょうか？",
+    "こんにちは！**Lumo**です。\n\nスケジュール管理、タスク登録、メモ作成など、なんでもお手伝いします。\n\n何をしましょうか？",
   timestamp: "—",
 };
 
@@ -40,9 +41,17 @@ const WELCOME_MESSAGE: Message = {
    Quick actions
    ────────────────────────────────────────── */
 const QUICK_ACTIONS = [
-  { icon: CalendarPlus, label: "予定を追加", prompt: "明日の14時に会議を追加して" },
+  {
+    icon: CalendarPlus,
+    label: "予定を追加",
+    prompt: "明日の14時に会議を追加して",
+  },
   { icon: ListChecks, label: "タスク登録", prompt: "タスクを新しく登録して" },
-  { icon: Sparkles, label: "今日の要約", prompt: "今日の予定とタスクをまとめて" },
+  {
+    icon: Sparkles,
+    label: "今日の要約",
+    prompt: "今日の予定とタスクをまとめて",
+  },
 ];
 
 /* ──────────────────────────────────────────
@@ -146,8 +155,8 @@ export default function ChatPage() {
                 prev.map((m) =>
                   m.id === aiMsgId
                     ? { ...m, content: m.content + parsed.text }
-                    : m
-                )
+                    : m,
+                ),
               );
             }
             if (parsed.status) {
@@ -155,16 +164,16 @@ export default function ChatPage() {
                 prev.map((m) =>
                   m.id === aiMsgId && m.content === ""
                     ? { ...m, content: `⏳ ${parsed.status}` }
-                    : m
-                )
+                    : m,
+                ),
               );
               setTimeout(() => {
                 setMessages((prev) =>
                   prev.map((m) =>
                     m.id === aiMsgId && m.content.startsWith("⏳")
                       ? { ...m, content: "" }
-                      : m
-                  )
+                      : m,
+                  ),
                 );
               }, 100);
             }
@@ -179,11 +188,11 @@ export default function ChatPage() {
         prev.map((m) =>
           m.id === aiMsgId
             ? {
-              ...m,
-              content: `エラーが発生しました: ${(err as Error).message}\n\n.env に ANTHROPIC_API_KEY が設定されているか確認してください。`,
-            }
-            : m
-        )
+                ...m,
+                content: `エラーが発生しました: ${(err as Error).message}\n\n.env に ANTHROPIC_API_KEY が設定されているか確認してください。`,
+              }
+            : m,
+        ),
       );
     } finally {
       setIsStreaming(false);
@@ -234,6 +243,13 @@ export default function ChatPage() {
                 {msg.role === "assistant" && (
                   <div className="chat-avatar chat-avatar-ai">
                     <Bot size={16} />
+                    <Image
+                      src="/login.png"
+                      alt="Lumo"
+                      width={36}
+                      height={36}
+                      className="rounded-[10px]"
+                    />
                   </div>
                 )}
 
@@ -242,8 +258,8 @@ export default function ChatPage() {
                 >
                   <div className="chat-bubble-content">
                     {msg.role === "assistant" &&
-                      msg.content === "" &&
-                      isStreaming ? (
+                    msg.content === "" &&
+                    isStreaming ? (
                       <div className="typing-indicator">
                         <span className="typing-dot" />
                         <span className="typing-dot" />
