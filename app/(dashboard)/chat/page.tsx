@@ -34,7 +34,7 @@ const WELCOME_MESSAGE: Message = {
   role: "assistant",
   content:
     "こんにちは！**Lumo**です。\n\nスケジュール管理、タスク登録、メモ作成など、なんでもお手伝いします。\n\n何をしましょうか？",
-  timestamp: "—",
+  timestamp: "",
 };
 
 /* ──────────────────────────────────────────
