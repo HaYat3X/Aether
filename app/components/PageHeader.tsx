@@ -100,7 +100,6 @@ import {
   X,
   CheckCircle2,
 } from "lucide-react";
-import NotificationPanel from "../components/feature/NotificationPanel";
 
 type PageMeta = {
   title: string;
@@ -139,75 +138,6 @@ const PAGE_META: Record<string, PageMeta> = {
   },
 };
 
-// ダミー通知データ
-const DUMMY_NOTIFICATIONS: Notification[] = [
-  {
-    id: "notif-1",
-    title: "タスク完了",
-    message: "週間レビューが完了しました",
-    timestamp: new Date(Date.now() - 5 * 60000),
-    isRead: false,
-    type: "success",
-  },
-  {
-    id: "notif-2",
-    title: "予定のリマインダー",
-    message: "明日の朝9時にミーティングがあります",
-    timestamp: new Date(Date.now() - 30 * 60000),
-    isRead: false,
-    type: "info",
-  },
-  {
-    id: "notif-3",
-    title: "新しいメッセージ",
-    message: "AIアシスタントからのコメント",
-    timestamp: new Date(Date.now() - 2 * 60 * 60000),
-    isRead: false,
-    type: "info",
-  },
-
-  {
-    id: "notif-3",
-    title: "新しいメッセージ",
-    message: "AIアシスタントからのコメント",
-    timestamp: new Date(Date.now() - 2 * 60 * 60000),
-    isRead: false,
-    type: "info",
-  },
-  {
-    id: "notif-3",
-    title: "新しいメッセージ",
-    message: "AIアシスタントからのコメント",
-    timestamp: new Date(Date.now() - 2 * 60 * 60000),
-    isRead: false,
-    type: "info",
-  },
-  {
-    id: "notif-3",
-    title: "新しいメッセージ",
-    message: "AIアシスタントからのコメント",
-    timestamp: new Date(Date.now() - 2 * 60 * 60000),
-    isRead: false,
-    type: "info",
-  },
-  {
-    id: "notif-3",
-    title: "新しいメッセージ",
-    message: "AIアシスタントからのコメント",
-    timestamp: new Date(Date.now() - 2 * 60 * 60000),
-    isRead: false,
-    type: "info",
-  },
-  {
-    id: "notif-3",
-    title: "新しいメッセージ",
-    message: "AIアシスタントからのコメント",
-    timestamp: new Date(Date.now() - 2 * 60 * 60000),
-    isRead: false,
-    type: "info",
-  },
-];
-
 function getToday() {
   const d = new Date();
   const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -238,23 +168,7 @@ export default function PageHeader() {
   const Icon = page.icon;
 
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [notifications, setNotifications] =
-    useState<Notification[]>(DUMMY_NOTIFICATIONS);
   const panelRef = useRef<HTMLDivElement>(null);
-
-  // 未読通知の数
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
-
-  // 通知をマークして削除
-  const handleMarkAsRead = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
-
-  // 全て確認処理
-  const handleMarkAllAsRead = () => {
-    setNotifications([]);
-    setIsNotificationOpen(false);
-  };
 
   // パネル外クリックで閉じる
   useEffect(() => {
@@ -295,29 +209,6 @@ export default function PageHeader() {
         {/* Right — date + notification bell */}
         <div className="page-header-right">
           <span className="page-header-date">{getToday()}</span>
-
-          <div className="page-header-notification-wrapper">
-            <button
-              className="page-header-bell"
-              title="通知"
-              onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-              aria-label="通知パネルを開く"
-            >
-              <Bell size={16} />
-              {unreadCount > 0 && <span className="bell-dot" />}
-            </button>
-
-            {/* 通知パネル */}
-            {isNotificationOpen && (
-              <div ref={panelRef}>
-                <NotificationPanel
-                  notifications={notifications}
-                  onMarkAsRead={handleMarkAsRead}
-                  onMarkAllAsRead={handleMarkAllAsRead}
-                />
-              </div>
-            )}
-          </div>
         </div>
       </header>
     </>
