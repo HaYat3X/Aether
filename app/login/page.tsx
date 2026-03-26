@@ -2,6 +2,7 @@ import { signIn } from "next-auth/react";
 import Image from "next/image";
 import "./main.css";
 import LoginButton from "./LoginButton";
+import "../globals.css";
 
 export default async function LoginPage({
   searchParams,

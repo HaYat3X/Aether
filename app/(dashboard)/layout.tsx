@@ -2,6 +2,7 @@
 import Sidebar from "../components/feature/Sidebar";
 import PageHeader from "../components/PageHeader";
 import { auth } from "@/auth";
+import "../globals.css";
 
 export default async function DashboardLayout({
   children,
