@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, JetBrains_Mono, Noto_Sans_JP } from "next/font/google";
-import "./globals.css";
+
 import { ThemeProvider } from "./components/ThemeProvider";
 
 const outfit = Outfit({
@@ -22,7 +22,10 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "Aether",
+  title: {
+    default: "Lumo",
+    template: "Lumo | %s",
+  },
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" }, // モダンブラウザ（OS設定に自動追従）
@@ -31,7 +34,7 @@ export const metadata: Metadata = {
     apple: "/aether_icon_dark_512.png", // iOS用
   },
   description:
-    "Aether is a knowledge graph management tool that helps you organize and visualize your information in a structured way.",
+    "Lumo is a knowledge graph management tool that helps you organize and visualize your information in a structured way.",
 };
 
 export const viewport: Viewport = {
@@ -48,6 +51,7 @@ export default function RootLayout({
   return (
     <html
       lang="ja"
+      data-theme="light"
       className={`${outfit.variable} ${jetbrainsMono.variable} ${notoSansJP.variable}`}
     >
       <body className="min-h-dvh overflow-hidden">

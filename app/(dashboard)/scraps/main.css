@@ -1,0 +1,506 @@
+/* ============================================
+   Scraps Page
+   ============================================ */
+
+/* ── New Scrap Modal ── */
+
+.scraps-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.scraps-new-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.scraps-new-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent-bright);
+  background: var(--color-accent-glow-subtle);
+}
+
+.scraps-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.scraps-filter-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.scraps-filter-btn:hover,
+.scraps-filter-btn.active {
+  border-color: var(--color-accent);
+  background: var(--color-accent-glow-subtle);
+  color: var(--color-accent-bright);
+}
+
+/* ── Loading ── */
+
+.scraps-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 20px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.scraps-spinner {
+  animation: spin 1s linear infinite;
+  color: var(--color-accent-bright);
+}
+
+/* ── Error ── */
+
+.scraps-error {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-radius: 14px;
+  background: rgba(248, 113, 113, 0.06);
+  border: 1px solid rgba(248, 113, 113, 0.12);
+  color: var(--color-red);
+  margin-bottom: 20px;
+}
+
+.scraps-error-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.scraps-error-detail {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.scraps-retry-btn {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  background: transparent;
+  color: var(--color-red);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.scraps-retry-btn:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* ── Empty State ── */
+
+.scraps-empty {
+  text-align: center;
+  padding: 48px 20px;
+}
+
+.scraps-empty-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--color-accent-glow-subtle);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-bright);
+  margin-bottom: 14px;
+}
+
+.scraps-empty-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 6px;
+}
+
+.scraps-empty-desc {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* ── Grid Layout ── */
+
+.scraps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.scraps-card {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 14px;
+  padding: 16px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  animation: fadeUp 0.45s ease-out both;
+}
+
+.scraps-card:hover {
+  border-color: var(--color-border-hover);
+  background: rgba(8, 14, 28, 0.65);
+}
+
+/* ── Card Header ── */
+
+.scraps-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.scraps-card-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.scraps-card-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.scraps-card:hover .scraps-card-actions {
+  opacity: 1;
+}
+
+.scraps-card-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.scraps-card-action-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-secondary);
+}
+
+/* ── Card Body ── */
+
+.scraps-card-body {
+  flex: 1;
+  margin-bottom: 12px;
+}
+
+.scraps-card-content {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+/* ── Card Footer ── */
+
+.scraps-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.scraps-card-category {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-text-primary);
+}
+
+.scraps-card-date {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 10px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Modal Overlay ── */
+
+.scraps-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.scraps-modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Modal ── */
+
+.scraps-modal {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+.scraps-modal-overlay.open .scraps-modal {
+  transform: scale(1);
+}
+
+.scraps-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.scraps-modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.scraps-modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.scraps-modal-close:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-secondary);
+}
+
+.scraps-modal-close:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── Form ── */
+
+.scraps-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.scraps-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scraps-form-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.scraps-form-input,
+.scraps-form-textarea,
+.scraps-form-select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-input);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.scraps-form-input::placeholder,
+.scraps-form-textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.scraps-form-input:focus,
+.scraps-form-textarea:focus,
+.scraps-form-select:focus {
+  outline: none;
+  border-color: var(--color-border-accent);
+  background: var(--color-bg-elevated);
+  box-shadow: 0 0 0 3px var(--color-accent-glow-subtle);
+}
+
+.scraps-form-input:disabled,
+.scraps-form-textarea:disabled,
+.scraps-form-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.scraps-form-textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.scraps-form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238896ab' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+}
+
+/* ── Form Actions ── */
+
+.scraps-form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.scraps-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scraps-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.scraps-btn-cancel {
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+}
+
+.scraps-btn-cancel:hover:not(:disabled) {
+  border-color: var(--color-border-hover);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-text-secondary);
+}
+
+.scraps-btn-submit {
+  background: linear-gradient(135deg, var(--color-accent-dim), var(--color-accent));
+  color: white;
+  border: none;
+}
+
+.scraps-btn-submit:hover:not(:disabled) {
+  box-shadow: 0 2px 12px var(--color-accent-glow-sm);
+  transform: translateY(-1px);
+}
+
+.scraps-btn-submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* ── Stagger Animation ── */
+
+.scraps-card:nth-child(1) { animation-delay: 0ms; }
+.scraps-card:nth-child(2) { animation-delay: 40ms; }
+.scraps-card:nth-child(3) { animation-delay: 80ms; }
+.scraps-card:nth-child(4) { animation-delay: 120ms; }
+.scraps-card:nth-child(5) { animation-delay: 160ms; }
+.scraps-card:nth-child(6) { animation-delay: 200ms; }
+.scraps-card:nth-child(7) { animation-delay: 240ms; }
+.scraps-card:nth-child(8) { animation-delay: 280ms; }
+.scraps-card:nth-child(9) { animation-delay: 320ms; }
+.scraps-card:nth-child(10) { animation-delay: 360ms; }
+.scraps-card:nth-child(11) { animation-delay: 400ms; }
+.scraps-card:nth-child(12) { animation-delay: 440ms; }

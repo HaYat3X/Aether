@@ -1,0 +1,222 @@
+/* ─────────────────────────────────────────────
+   Login Page — main.css
+   Aether / Lumo Light Mode  |  DESIGN.md 準拠
+   ───────────────────────────────────────────── */
+
+/* ── Page wrapper ── */
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  background: var(--color-bg-base);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Subtle warm background texture ── */
+.login-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 20%, rgba(204, 85, 34, 0.055) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 75% 80%, rgba(204, 85, 34, 0.035) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ── Decorative grid lines (very subtle) ── */
+.login-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 100%);
+}
+
+/* ── Card ── */
+.login-card {
+  position: relative;
+  z-index: 1;
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 20px;
+  padding: 44px 40px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-width: 340px;
+  max-width: 380px;
+  width: 100%;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    0 8px 32px rgba(0, 0, 0, 0.07),
+    0 0 0 0.5px rgba(255, 255, 255, 0.8) inset;
+  backdrop-filter: blur(8px);
+  animation: loginCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes loginCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Logo area ── */
+.login-logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+  animation: loginCardIn 0.5s 0.06s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.login-logo-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 2px 8px rgba(204, 85, 34, 0.18),
+    0 0 0 1px rgba(204, 85, 34, 0.12);
+  flex-shrink: 0;
+}
+
+.login-logo-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Fallback: アイコン未配置時は accent 背景のロゴ文字 */
+.login-logo-icon-fallback {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 2px 8px rgba(204, 85, 34, 0.25),
+    0 0 0 1px rgba(204, 85, 34, 0.15);
+  flex-shrink: 0;
+}
+
+.login-logo-icon-fallback span {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.login-app-name {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.4px;
+}
+
+/* ── Divider / tagline ── */
+.login-tagline {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  animation: loginCardIn 0.5s 0.12s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Divider ── */
+.login-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--color-border, rgba(0, 0, 0, 0.07));
+  margin-bottom: 24px;
+  animation: loginCardIn 0.5s 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Google Sign-in Button ── */
+.login-google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border-hover, rgba(0, 0, 0, 0.12));
+  background: var(--color-bg-surface, #ffffff);
+  color: var(--color-text-primary);
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.15s ease;
+  animation: loginCardIn 0.5s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.login-google-btn:hover {
+  background: var(--color-bg-elevated, #faf9f6);
+  border-color: var(--color-border-accent, rgba(204, 85, 34, 0.25));
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 0 0 3px var(--color-accent-glow-subtle, rgba(204, 85, 34, 0.06));
+  transform: translateY(-1px);
+}
+
+.login-google-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.login-google-btn-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* ── Footer note ── */
+.login-footer-note {
+  margin-top: 20px;
+  font-size: 11px;
+  color: var(--color-text-dim, #b8b0a8);
+  text-align: center;
+  line-height: 1.7;
+  animation: loginCardIn 0.5s 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.login-footer-note a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.login-footer-note a:hover {
+  text-decoration: underline;
+}
+
+.login-error {
+  font-size: 12px;
+  color: var(--color-accent); /* テラコッタオレンジ */
+  text-align: center;
+  margin-bottom: 16px;
+  animation: loginCardIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}

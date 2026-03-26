@@ -7,7 +7,7 @@ type Theme = "dark" | "light";
 const ThemeContext = createContext<{
   theme: Theme;
   toggle: () => void;
-}>({ theme: "dark", toggle: () => {} });
+}>({ theme: "dark", toggle: () => { } });
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>("dark");
@@ -15,7 +15,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // 初期値をlocalStorageから読む
   useEffect(() => {
     const saved = localStorage.getItem("aether-theme") as Theme | null;
-    const initial = saved ?? "dark"; // デフォルトはdark
+    const initial = saved ?? "light"; // デフォルトはlight
     setTheme(initial);
     document.documentElement.dataset.theme = initial; // 必ずセット
   }, []);
