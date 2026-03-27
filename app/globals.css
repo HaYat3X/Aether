@@ -46,7 +46,7 @@
   --color-border-accent: rgba(59, 130, 246, 0.15);
 
   /* Sidebar */
-  --sidebar-width: 260px;
+  --sidebar-width: 225px;
 }
 
 /* ============================================
@@ -912,3 +912,12 @@ body {
 [data-theme="light"] .typing-dot {
   background: var(--color-text-muted);
 }
+
+/* ====================================================== */
+/* Dashboard Sidebar State Management */
+/* ====================================================== */
+
+/* CSS兄弟セレクタを使用してサイドバー状態に応じてmainを調整 */
+/* .sidebar.sidebar-collapsed ~ .dashboard-main {
+  margin-left: 0 !important;
+} */
