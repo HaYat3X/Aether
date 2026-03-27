@@ -171,11 +171,11 @@ function SummaryBar({
           <span className="tasks-summary-unit">/{total}</span>
         </div>
         <div className="tasks-summary-status-row">
-          <span className="tasks-status-chip chip-inprogress">
-            {byStatus.進行中} 進行中
-          </span>
           <span className="tasks-status-chip chip-todo">
             {byStatus.未着手} 未着手
+          </span>
+          <span className="tasks-status-chip chip-inprogress">
+            {byStatus.進行中} 進行中
           </span>
           {byStatus.保留 > 0 && (
             <span className="tasks-status-chip chip-hold">
