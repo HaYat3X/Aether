@@ -432,6 +432,7 @@
     transform 0.15s ease;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .tasks-card::before {
