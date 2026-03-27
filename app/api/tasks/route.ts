@@ -161,10 +161,7 @@ export async function GET(_req: NextRequest) {
         category: extractSelect(p["種類"]) ?? null,
         summary: extractRichText(p["概要"]) || null,
         estimatedHours: extractNumber(p["見積時間(h)"]),
-        // sprintStatus:    extractFormula(p["取得用：スプリントステータス"]),
-        // 新規追加
         progress: extractNumber(p["進捗率"]), // 0.0〜1.0 or 0〜100
-        weeklyProgress: extractNumber(p["目標進捗率（今週）"]), // 今週目標
         dueDate: extractDate(p["期限"]),
       };
     });

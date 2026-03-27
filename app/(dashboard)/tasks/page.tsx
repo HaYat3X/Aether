@@ -26,7 +26,6 @@ type Task = {
   estimatedHours: number | null;
   sprintStatus: string | null;
   progress: number | null;
-  weeklyProgress: number | null;
   dueDate: string | null;
 };
 
