@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .tasks-total-badge {
@@ -58,8 +58,12 @@
 }
 
 @keyframes tspin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .tasks-spinner {
@@ -98,7 +102,188 @@
   background: rgba(248, 113, 113, 0.1);
 }
 
-/* ── Board layout ── */
+/* ============================================
+   Summary Bar
+   ============================================ */
+
+.tasks-summary-bar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 900px) {
+  .tasks-summary-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.tasks-summary-card {
+  background: var(--color-glass);
+  border: 1px solid var(--color-glass-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 0.2s ease;
+  animation: fadeUp 0.45s ease-out both;
+}
+
+.tasks-summary-card:hover {
+  border-color: var(--color-border-hover);
+}
+
+.tasks-summary-card--alert {
+  border-color: rgba(248, 113, 113, 0.2);
+  background: rgba(248, 113, 113, 0.04);
+}
+
+.tasks-summary-card--skeleton {
+  min-height: 96px;
+  background: rgba(255, 255, 255, 0.02);
+  border-color: var(--color-border);
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skeletonPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.tasks-summary-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+
+.tasks-summary-value {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.1;
+}
+
+.tasks-summary-unit {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  margin-left: 2px;
+}
+
+.tasks-summary-value--alert {
+  color: var(--color-red);
+}
+
+.tasks-summary-value--ok {
+  color: var(--color-green);
+}
+
+.tasks-summary-sub {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* Progress track */
+.tasks-summary-track {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+[data-theme="light"] .tasks-summary-track {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.tasks-summary-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tasks-summary-fill--progress {
+  background: linear-gradient(90deg, var(--color-green));
+}
+
+.tasks-summary-fill--hours {
+  background: var(--color-green);
+}
+
+/* Status chips */
+.tasks-summary-status-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.tasks-status-chip {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.chip-inprogress {
+  background: #0076d934;
+  color: #264a72;
+}
+
+.chip-todo {
+  background: #1c13011c;
+  color: #494846;
+}
+
+.chip-hold {
+  background: #5c00a324;
+  color: #553b69;
+}
+
+[data-theme="light"] .chip-inprogress {
+  background: #0076d934;
+  color: #264a72;
+}
+
+[data-theme="light"] .chip-todo {
+  background: #1c13011c;
+  color: #494846;
+}
+
+/* ── Summary card stagger ── */
+.tasks-summary-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+.tasks-summary-card:nth-child(2) {
+  animation-delay: 50ms;
+}
+.tasks-summary-card:nth-child(3) {
+  animation-delay: 100ms;
+}
+.tasks-summary-card:nth-child(4) {
+  animation-delay: 150ms;
+}
+
+/* ============================================
+   Board layout
+   ============================================ */
 
 .tasks-board {
   display: grid;
@@ -133,10 +318,18 @@
   animation: fadeUp 0.45s ease-out both;
 }
 
-.tasks-col:nth-child(1) { animation-delay: 0ms; }
-.tasks-col:nth-child(2) { animation-delay: 60ms; }
-.tasks-col:nth-child(3) { animation-delay: 120ms; }
-.tasks-col:nth-child(4) { animation-delay: 180ms; }
+.tasks-col:nth-child(1) {
+  animation-delay: 0ms;
+}
+.tasks-col:nth-child(2) {
+  animation-delay: 60ms;
+}
+.tasks-col:nth-child(3) {
+  animation-delay: 120ms;
+}
+.tasks-col:nth-child(4) {
+  animation-delay: 180ms;
+}
 
 /* Column header */
 .tasks-col-header {
@@ -152,6 +345,7 @@
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
+  margin-top: 2.5px;
 }
 
 .tasks-col-title {
@@ -191,31 +385,54 @@
 }
 
 /* ── Column color themes ── */
+.tasks-col.col-todo .tasks-col-dot {
+  background: #8e8b86;
+}
+.tasks-col.col-todo .tasks-col-title {
+  color: #8e8b86;
+}
+.tasks-col.col-inprogress {
+  border-color: #2783de;
+}
+.tasks-col.col-inprogress .tasks-col-dot {
+  background: #2783de;
+}
+.tasks-col.col-inprogress .tasks-col-title {
+  color: #2783de;
+}
+.tasks-col.col-done .tasks-col-dot {
+  background: #46a171;
+}
+.tasks-col.col-done .tasks-col-title {
+  color: #46a171;
+}
+.tasks-col.col-hold .tasks-col-dot {
+  background: #b577d6;
+}
+.tasks-col.col-hold .tasks-col-title {
+  color: #b577d6;
+}
+[data-theme="light"] .tasks-col.col-inprogress .tasks-col-dot {
+  background: #2783de;
+}
 
-.tasks-col.col-todo .tasks-col-dot   { background: var(--color-text-muted); }
-.tasks-col.col-todo .tasks-col-title { color: var(--color-text-muted); }
-
-.tasks-col.col-inprogress              { border-color: rgba(59, 130, 246, 0.12); }
-.tasks-col.col-inprogress .tasks-col-dot   { background: var(--color-accent); box-shadow: 0 0 6px var(--color-accent-glow-sm); }
-.tasks-col.col-inprogress .tasks-col-title { color: var(--color-accent-bright); }
-
-.tasks-col.col-done .tasks-col-dot   { background: var(--color-green); box-shadow: 0 0 6px rgba(52, 211, 153, 0.35); }
-.tasks-col.col-done .tasks-col-title { color: var(--color-green); }
-
-.tasks-col.col-hold .tasks-col-dot   { background: var(--color-purple); box-shadow: 0 0 6px rgba(167, 139, 250, 0.35); }
-.tasks-col.col-hold .tasks-col-title { color: var(--color-purple); }
+[data-theme="light"] .tasks-col.col-inprogress .tasks-col-title {
+  color: #2783de;
+}
 
 /* ── Task Card ── */
-
 .tasks-card {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
   border-radius: 11px;
   padding: 11px 12px 11px 15px;
   cursor: default;
-  transition: border-color 0.18s ease, transform 0.15s ease;
+  transition:
+    border-color 0.18s ease,
+    transform 0.15s ease;
   position: relative;
   overflow: hidden;
+  cursor: grab;
 }
 
 .tasks-card::before {
@@ -232,12 +449,51 @@
   transform: translateY(-1px);
 }
 
+/* ドラッグ中のカード */
+.tasks-card.opacity-50 {
+  opacity: 0.5;
+  border-color: var(--color-accent-bright);
+}
+
+/* 期限切れカード */
+.tasks-card.is-overdue {
+  border-color: rgba(248, 113, 113, 0.25);
+  background: rgba(248, 113, 113, 0.03);
+}
+
+.tasks-card.is-overdue::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 18px 18px 0;
+  border-color: transparent rgba(248, 113, 113, 0.35) transparent transparent;
+}
+
 /* Priority left-bar */
-.tasks-card.prio-highest::before { background: var(--color-red);    box-shadow: 2px 0 8px rgba(248, 113, 113, 0.4); }
-.tasks-card.prio-high::before    { background: var(--color-amber);  box-shadow: 2px 0 8px rgba(251, 191, 36, 0.4); }
-.tasks-card.prio-medium::before  { background: var(--color-accent); box-shadow: 2px 0 8px rgba(59, 130, 246, 0.35); }
-.tasks-card.prio-low::before     { background: var(--color-purple); box-shadow: 2px 0 8px rgba(167, 139, 250, 0.35); }
-.tasks-card.prio-lowest::before  { background: var(--color-text-dim); }
+.tasks-card.prio-highest::before {
+  background: #ce1800;
+  box-shadow: 2px 0 8px rgba(206, 24, 0, 0.4);
+}
+.tasks-card.prio-high::before {
+  background: #b7004e;
+  box-shadow: 2px 0 8px rgba(183, 0, 78, 0.4);
+}
+.tasks-card.prio-medium::before {
+  background: #d19100;
+  box-shadow: 2px 0 8px rgba(209, 145, 0, 0.4);
+}
+.tasks-card.prio-low::before {
+  background: #0076d9;
+  box-shadow: 2px 0 8px rgba(0, 118, 217, 0.35);
+}
+.tasks-card.prio-lowest::before {
+  background: #1c1301;
+  box-shadow: 2px 0 8px rgba(0, 118, 217, 0.35);
+}
 
 /* Card title */
 .tasks-card-title {
@@ -262,9 +518,50 @@
   line-height: 1.5;
   margin-bottom: 9px;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* ── Progress bar in card ── */
+.tasks-card-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tasks-card-progress-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+[data-theme="light"] .tasks-card-progress-track {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.tasks-card-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--color-green));
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"] .tasks-card-progress-fill {
+  background: linear-gradient(90deg, var(--color-green));
+}
+
+.tasks-card-progress-pct {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  width: 28px;
+  text-align: right;
 }
 
 /* Meta row */
@@ -281,7 +578,6 @@
   align-items: center;
   gap: 4px;
   font-size: 10px;
-  font-weight: 600;
   padding: 2px 7px;
   border-radius: 5px;
   white-space: nowrap;
@@ -289,22 +585,120 @@
 }
 
 /* Priority badges */
-.badge-prio-highest { background: rgba(248, 113, 113, 0.12); color: var(--color-red); }
-.badge-prio-high    { background: rgba(251, 191, 36,  0.12); color: var(--color-amber); }
-.badge-prio-medium  { background: rgba(59,  130, 246, 0.10); color: var(--color-accent-bright); }
-.badge-prio-low     { background: rgba(167, 139, 250, 0.12); color: var(--color-purple); }
-.badge-prio-lowest  { background: rgba(255, 255, 255, 0.04); color: var(--color-text-muted); }
+.badge-prio-highest {
+  background: #ce18002a;
+  color: #6d3531;
+}
+.badge-prio-high {
+  background: #b7004e27;
+  color: #68354e;
+}
+.badge-prio-medium {
+  background: #d1910041;
+  color: #655121;
+}
+.badge-prio-low {
+  background: #0076d934;
+  color: #264a72;
+}
+.badge-prio-lowest {
+  background: #1c13011c;
+  color: #494846;
+}
+[data-theme="light"] .badge-prio-medium {
+  background: #d1910041;
+  color: #655121;
+}
 
 /* Category badges */
-.badge-cat-goal    { background: rgba(59,  130, 246, 0.10); color: var(--color-accent-bright); }
-.badge-cat-routine { background: rgba(251, 191, 36,  0.10); color: var(--color-amber); }
-.badge-cat-project { background: rgba(248, 113, 113, 0.10); color: var(--color-red); }
-.badge-cat-adhoc   { background: rgba(167, 139, 250, 0.10); color: var(--color-purple); }
-.badge-cat-misc    { background: rgba(255, 255, 255, 0.04); color: var(--color-text-muted); }
+.badge-cat-goal {
+  background: #0076d934;
+  color: #264a72;
+}
+.badge-cat-routine {
+  background: #d1910041;
+  color: #655121;
+}
+.badge-cat-project {
+  background: #ce18002a;
+  color: #6d3531;
+}
+.badge-cat-adhoc {
+  background: #5c00a324;
+  color: #553b69;
+}
+.badge-cat-misc {
+  background: #1c13011c;
+  color: #494846;
+}
 
 /* Hours badge */
 .badge-hours {
   background: rgba(255, 255, 255, 0.04);
   color: var(--color-text-muted);
   font-family: var(--font-mono), "JetBrains Mono", monospace;
+}
+
+/* ── Due date badges ── */
+.tasks-due-badge {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+}
+
+.due-overdue {
+  background: #ce18002a;
+  color: #6d3531;
+  font-weight: 600;
+  animation: duePulse 2s ease-in-out infinite;
+}
+
+.due-today {
+  background: #d1910041;
+  color: #655121;
+}
+
+.due-soon {
+  background: #0076d934;
+  color: #264a72;
+}
+
+.due-normal {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text-muted);
+}
+
+@keyframes duePulse {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+[data-theme="light"] .badge-cat-goal {
+  background: rgba(204, 85, 34, 0.1);
+  color: var(--color-accent);
+}
+
+[data-theme="light"] .tasks-col.col-inprogress {
+  border-color: rgba(204, 85, 34, 0.12);
+}
+
+[data-theme="light"] .tasks-card.prio-medium::before {
+  background: #d19100;
+  box-shadow: 2px 0 8px rgba(209, 145, 0, 0.4);
+}
+
+[data-theme="light"] .chip-inprogress {
+  background: #0076d934;
+  color: #264a72;
+}
+
+[data-theme="light"] .tasks-summary-card--alert {
+  border-color: rgba(248, 113, 113, 0.2);
+}
+
+[data-theme="light"] .tasks-summary-fill--progress {
+  background: linear-gradient(90deg, var(--color-green));
 }
