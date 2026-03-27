@@ -1,6 +1,7 @@
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../components/feature/Sidebar";
 import PageHeader from "../components/PageHeader";
 import { auth } from "@/auth";
+import "../globals.css";
 
 export default async function DashboardLayout({
   children,
@@ -15,9 +16,15 @@ export default async function DashboardLayout({
 
       {/* Main content area */}
       <main
-        className="ml-[260px] flex flex-1 flex-col overflow-hidden"
+        className="dashboard-main"
         style={{
+          marginLeft: "225px",
           background: "var(--color-bg-base)",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          transition: "margin-left 0.3s ease",
         }}
       >
         {/* Fixed header */}
