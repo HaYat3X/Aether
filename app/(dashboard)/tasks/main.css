@@ -432,7 +432,7 @@
     transform 0.15s ease;
   position: relative;
   overflow: hidden;
-  cursor: pointer;
+  cursor: grab;
 }
 
 .tasks-card::before {
@@ -447,6 +447,12 @@
 .tasks-card:hover {
   border-color: var(--color-border-hover);
   transform: translateY(-1px);
+}
+
+/* ドラッグ中のカード */
+.tasks-card.opacity-50 {
+  opacity: 0.5;
+  border-color: var(--color-accent-bright);
 }
 
 /* 期限切れカード */

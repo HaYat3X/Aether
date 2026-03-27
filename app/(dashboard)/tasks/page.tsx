@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import "./main.css";
 import {
   Loader2,
@@ -29,6 +29,11 @@ type Task = {
   dueDate: string | null;
 };
 
+type DragState = {
+  taskId: string | null;
+  sourceStatus: string | null;
+};
+
 type Summary = {
   total: number;
   byStatus: { 未着手: number; 進行中: number; 完了: number; 保留: number };
@@ -46,8 +51,8 @@ type Summary = {
 const STATUSES = [
   { key: "未着手", colClass: "col-todo", label: "未着手" },
   { key: "進行中", colClass: "col-inprogress", label: "進行中" },
-  { key: "完了", colClass: "col-done", label: "完了" },
   { key: "保留", colClass: "col-hold", label: "保留" },
+  { key: "完了", colClass: "col-done", label: "完了" },
 ] as const;
 
 const PRIORITY_CARD_CLASS: Record<string, string> = {
@@ -249,10 +254,14 @@ function TaskCard({
   task,
   index,
   today,
+  onDragStart,
+  isDragging,
 }: {
   task: Task;
   index: number;
   today: string;
+  onDragStart?: (taskId: string, sourceStatus: string) => void;
+  isDragging?: boolean;
 }) {
   const cardClass = PRIORITY_CARD_CLASS[task.priority] ?? "";
   const prioBadge = PRIORITY_BADGE_CLASS[task.priority] ?? "badge-prio-lowest";
@@ -266,8 +275,10 @@ function TaskCard({
 
   const inner = (
     <div
-      className={`tasks-card ${cardClass}${isOverdue ? " is-overdue" : ""}`}
-      style={{ animationDelay: `${index * 45}ms` }}
+      draggable
+      className={`tasks-card ${cardClass}${isOverdue ? " is-overdue" : ""}${isDragging ? " opacity-50" : ""}`}
+      style={{ animationDelay: `${index * 45}ms`, cursor: "grab" }}
+      onDragStart={() => onDragStart?.(task.id, task.status)}
     >
       {/* タイトル */}
       <p className={`tasks-card-title${isDone ? " is-done" : ""}`}>
@@ -339,6 +350,14 @@ export default function TasksPage() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dragState, setDragState] = useState<DragState>({
+    taskId: null,
+    sourceStatus: null,
+  });
+  const [updatingTaskId, setUpdatingTaskId] = useState<string | null>(null);
+  const updateTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
@@ -363,6 +382,72 @@ export default function TasksPage() {
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
+
+  // ドラッグ開始
+  const handleDragStart = (taskId: string, sourceStatus: string) => {
+    setDragState({ taskId, sourceStatus });
+  };
+
+  // ドロップ時の更新
+  const handleDrop = useCallback(
+    async (targetStatus: string) => {
+      if (
+        !dragState.taskId ||
+        !dragState.sourceStatus ||
+        dragState.sourceStatus === targetStatus
+      ) {
+        setDragState({ taskId: null, sourceStatus: null });
+        return;
+      }
+
+      const taskId = dragState.taskId;
+      const sourceStatus = dragState.sourceStatus; // ここで sourceStatus は string 確定
+      setDragState({ taskId: null, sourceStatus: null });
+
+      // 楽観的更新
+      setTasks((prevTasks: Task[]): Task[] =>
+        prevTasks.map(
+          (t: Task): Task =>
+            t.id === taskId ? { ...t, status: targetStatus } : t,
+        ),
+      );
+
+      // ローディング状態
+      setUpdatingTaskId(taskId);
+      if (updateTimeoutRef.current) clearTimeout(updateTimeoutRef.current);
+
+      try {
+        const res = await fetch("/api/tasks/update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ taskId, newStatus: targetStatus }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: "API error" }));
+          throw new Error(err.error || `HTTP ${res.status}`);
+        }
+
+        // 成功 - UIはもう更新済み
+        updateTimeoutRef.current = setTimeout(
+          () => setUpdatingTaskId(null),
+          600,
+        );
+      } catch (err) {
+        // エラー時はロールバック
+        // この時点で sourceStatus は string なので型エラーなし
+        setTasks((prevTasks: Task[]): Task[] =>
+          prevTasks.map(
+            (t: Task): Task =>
+              t.id === taskId ? { ...t, status: sourceStatus } : t,
+          ),
+        );
+        setError((err as Error).message);
+        setUpdatingTaskId(null);
+      }
+    },
+    [dragState],
+  );
 
   // Group tasks by status
   const grouped = STATUSES.reduce<Record<string, Task[]>>((acc, s) => {
@@ -418,7 +503,12 @@ export default function TasksPage() {
           {STATUSES.map((status) => {
             const cols = grouped[status.key] ?? [];
             return (
-              <div key={status.key} className={`tasks-col ${status.colClass}`}>
+              <div
+                key={status.key}
+                className={`tasks-col ${status.colClass}`}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={() => handleDrop(status.key)}
+              >
                 {/* Column header */}
                 <div className="tasks-col-header">
                   <span className="tasks-col-dot" />
@@ -437,6 +527,14 @@ export default function TasksPage() {
                         task={task}
                         index={i}
                         today={today}
+                        onDragStart={handleDragStart}
+                        isDragging={
+                          dragState.taskId === task.id
+                            ? true
+                            : updatingTaskId === task.id
+                              ? true
+                              : false
+                        }
                       />
                     ))
                   )}
