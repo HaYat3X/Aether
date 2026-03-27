@@ -1,14 +1,19 @@
-import Sidebar from "../components/Sidebar";
+// import Sidebar from "../components/Sidebar";
+import Sidebar from "../components/feature/Sidebar";
 import PageHeader from "../components/PageHeader";
+import { auth } from "@/auth";
+import "../globals.css";
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await auth();
+
   return (
     <div className="flex h-dvh">
-      <Sidebar />
+      <Sidebar user={session?.user ?? null} />
 
       {/* Main content area */}
       <main
@@ -23,9 +28,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-9 pb-9">
-          {children}
-        </div>
+        <div className="flex-1 overflow-y-auto px-9 pb-9">{children}</div>
       </main>
     </div>
   );
