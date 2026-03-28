@@ -23,6 +23,7 @@ import {
   TrendingUp,
   ChevronsLeft,
   ChevronsRight,
+  TowelRack
 } from "lucide-react";
 import { NavSection } from "../ui/NavSection/NavSection";
 import type { NavItem, SidebarUser } from "@/app/types/Sidebar";
@@ -43,7 +44,7 @@ const MAIN_NAV: NavItem[] = [
     label: "Tasks",
   },
   { href: "/daily", icon: Clock, label: "Daily Plan" },
-  { href: "/scraps", icon: BookOpen, label: "Scraps" },
+  { href: "/scraps", icon: TowelRack, label: "Scraps" },
   { href: "/trends", icon: TrendingUp, label: "Trend" },
 ];
 

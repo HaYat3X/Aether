@@ -1,0 +1,11 @@
+  <button
+          className="refresh-btn"
+          onClick={fetchScraps}
+          disabled={loading}
+        >
+          <RefreshCw
+            size={13}
+            style={loading ? { animation: "tspin 1s linear infinite" } : {}}
+          />
+          更新
+        </button>

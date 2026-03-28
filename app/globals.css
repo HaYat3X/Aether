@@ -148,7 +148,7 @@
   color: var(--color-text-primary);
 }
 
-[data-theme="light"] .nav-item.active > svg {
+[data-theme="light"] .nav-item.active>svg {
   color: var(--color-accent);
 }
 
@@ -196,11 +196,9 @@
 
 /* ── Light mode timeline/progress fill ── */
 [data-theme="light"] .daily-progress-fill {
-  background: linear-gradient(
-    90deg,
-    var(--color-accent-dim),
-    var(--color-accent)
-  );
+  background: linear-gradient(90deg,
+      var(--color-accent-dim),
+      var(--color-accent));
 }
 
 /* ── Light mode pulseGlow override ── */
@@ -209,6 +207,7 @@
 }
 
 @keyframes pulseGlowLight {
+
   0%,
   100% {
     box-shadow: 0 0 6px rgba(204, 85, 34, 0.2);
@@ -217,219 +216,6 @@
   50% {
     box-shadow: 0 0 14px rgba(204, 85, 34, 0.4);
   }
-}
-
-/* ── Light mode tasks board col in-progress ── */
-[data-theme="light"] .tasks-col.col-inprogress {
-  border-color: rgba(204, 85, 34, 0.12);
-}
-
-[data-theme="light"] .tasks-col.col-inprogress .tasks-col-dot {
-  background: var(--color-accent);
-  box-shadow: 0 0 6px rgba(204, 85, 34, 0.25);
-}
-
-[data-theme="light"] .tasks-col.col-inprogress .tasks-col-title {
-  color: var(--color-accent);
-}
-
-/* ── Light mode priority medium badge ── */
-[data-theme="light"] .badge-prio-medium {
-  background: rgba(204, 85, 34, 0.1);
-  color: var(--color-accent);
-}
-
-[data-theme="light"] .tasks-card.prio-medium::before {
-  background: var(--color-accent);
-  box-shadow: 2px 0 8px rgba(204, 85, 34, 0.25);
-}
-
-/* ── Light mode timeline cat-goal ── */
-[data-theme="light"] .timeline-card.cat-goal {
-  border-left-color: var(--color-accent);
-  background: linear-gradient(
-    135deg,
-    rgba(204, 85, 34, 0.04) 0%,
-    var(--color-glass) 60%
-  );
-}
-
-[data-theme="light"] .timeline-badge.badge-status {
-  background: rgba(204, 85, 34, 0.1);
-  color: var(--color-accent);
-}
-
-[data-theme="light"] .timeline-badge.badge-cat-goal {
-  background: rgba(204, 85, 34, 0.1);
-  color: var(--color-accent);
-}
-
-/* ── Light mode empty state icons ── */
-[data-theme="light"] .daily-empty-icon,
-[data-theme="light"] .scraps-empty-icon {
-  background: rgba(204, 85, 34, 0.06);
-  border-color: rgba(204, 85, 34, 0.12);
-  color: var(--color-accent);
-}
-
-/* ── Light mode quick action hover ── */
-[data-theme="light"] .quick-action-btn:hover {
-  border-color: rgba(204, 85, 34, 0.25);
-  color: var(--color-accent);
-  background: rgba(204, 85, 34, 0.05);
-}
-
-/* ── Light mode scraps card ── */
-[data-theme="light"] .scraps-card:hover {
-  background: #faf8f5;
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-/* ── Light mode modal overlay ── */
-[data-theme="light"] .scraps-modal-overlay {
-  background: rgba(26, 23, 20, 0.45);
-}
-
-/* ── Light mode chat bubble user ── */
-[data-theme="light"] .chat-bubble-user {
-  background: #1a1714;
-  border-color: rgba(0, 0, 0, 0.15);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-}
-
-/* ── Light mode chat avatar ai ── */
-[data-theme="light"] .chat-avatar-ai {
-  background: rgba(204, 85, 34, 0.08);
-  border-color: rgba(204, 85, 34, 0.15);
-  color: var(--color-accent);
-}
-
-/* ── Light mode chat send btn ── */
-[data-theme="light"] .chat-send-btn.active {
-  background: var(--color-accent);
-  box-shadow: 0 2px 8px rgba(204, 85, 34, 0.25);
-}
-
-[data-theme="light"] .chat-send-btn.active:hover {
-  box-shadow: 0 2px 14px rgba(204, 85, 34, 0.35);
-}
-
-/* ── Light mode input focus ── */
-[data-theme="light"] .chat-input-wrapper:focus-within,
-[data-theme="light"] .scraps-form-input:focus,
-[data-theme="light"] .scraps-form-textarea:focus,
-[data-theme="light"] .scraps-form-select:focus {
-  border-color: rgba(204, 85, 34, 0.3);
-  box-shadow: 0 0 0 3px rgba(204, 85, 34, 0.06);
-}
-
-/* ── Light mode page header icon ── */
-[data-theme="light"] .page-header-icon {
-  background: rgba(204, 85, 34, 0.08);
-  border-color: rgba(204, 85, 34, 0.18);
-  color: var(--color-accent);
-}
-
-/* ── Light mode today btn ── */
-[data-theme="light"] .daily-today-btn {
-  background: rgba(204, 85, 34, 0.06);
-  border-color: rgba(204, 85, 34, 0.2);
-  color: var(--color-accent);
-}
-
-[data-theme="light"] .daily-today-btn:hover {
-  background: rgba(204, 85, 34, 0.12);
-  border-color: rgba(204, 85, 34, 0.3);
-}
-
-/* ── Light mode refresh/tasks btn ── */
-[data-theme="light"] .tasks-refresh-btn:hover,
-[data-theme="light"] .scraps-new-btn:hover {
-  border-color: rgba(204, 85, 34, 0.25);
-  color: var(--color-accent);
-  background: rgba(204, 85, 34, 0.05);
-}
-
-/* ── Light mode markdown code ── */
-[data-theme="light"] .md-content code {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.08);
-  color: var(--color-accent);
-}
-
-[data-theme="light"] .md-content pre {
-  background: var(--color-bg-elevated);
-  border-color: rgba(0, 0, 0, 0.07);
-}
-
-[data-theme="light"] .md-content blockquote {
-  border-left-color: rgba(204, 85, 34, 0.25);
-}
-
-/* ── Light mode scraps/form submit btn ── */
-[data-theme="light"] .scraps-btn-submit {
-  background: var(--color-accent);
-}
-
-[data-theme="light"] .scraps-btn-submit:hover:not(:disabled) {
-  box-shadow: 0 2px 12px rgba(204, 85, 34, 0.25);
-}
-
-/* ── Light mode timeline is-current ── */
-[data-theme="light"] .timeline-card.is-current {
-  border-color: rgba(204, 85, 34, 0.15);
-  background: rgba(204, 85, 34, 0.03);
-  box-shadow: 0 0 16px rgba(204, 85, 34, 0.06);
-}
-
-/* ── Light mode timeline hover ── */
-[data-theme="light"] .timeline-card:hover {
-  border-color: rgba(0, 0, 0, 0.1);
-  background: #faf8f5;
-}
-
-/* ── Light mode glass card hover ── */
-[data-theme="light"] .glass-card:hover,
-[data-theme="light"] .chat-sidebar-card:hover,
-[data-theme="light"] .daily-stat-card:hover {
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-/* ── Light mode progress track (bg) ── */
-[data-theme="light"] .daily-progress-track,
-[data-theme="light"] .timeline-progress-track {
-  background: rgba(0, 0, 0, 0.06);
-}
-
-/* ── Light mode nav sub ── */
-[data-theme="light"] .nav-sub .nav-item:hover {
-  background: rgba(0, 0, 0, 0.02);
-  color: var(--color-text-secondary);
-}
-
-[data-theme="light"] .nav-sub .nav-item.active {
-  background: rgba(204, 85, 34, 0.05);
-  color: var(--color-accent);
-}
-
-[data-theme="light"] .nav-sub .nav-item.active .sub-dot {
-  background: var(--color-accent);
-  box-shadow: 0 0 6px rgba(204, 85, 34, 0.2);
-}
-
-/* ── Light mode filter btn active ── */
-[data-theme="light"] .scraps-filter-btn:hover,
-[data-theme="light"] .scraps-filter-btn.active {
-  border-color: rgba(204, 85, 34, 0.25);
-  background: rgba(204, 85, 34, 0.06);
-  color: var(--color-accent);
-}
-
-/* ── Light mode tasks spinner/loading ── */
-[data-theme="light"] .tasks-spinner,
-[data-theme="light"] .daily-spinner,
-[data-theme="light"] .scraps-spinner {
-  color: var(--color-accent);
 }
 
 /* ============================================
@@ -490,11 +276,9 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(
-    135deg,
-    var(--color-accent) 0%,
-    var(--color-accent-dim) 100%
-  );
+  background: linear-gradient(135deg,
+      var(--color-accent) 0%,
+      var(--color-accent-dim) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -613,7 +397,7 @@ body {
   color: var(--color-text-primary);
 }
 
-.nav-item.active > svg {
+.nav-item.active>svg {
   opacity: 1;
   color: var(--color-accent-bright);
 }
@@ -733,11 +517,9 @@ body {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: linear-gradient(
-    135deg,
-    var(--color-accent-dim),
-    var(--color-purple)
-  );
+  background: linear-gradient(135deg,
+      var(--color-accent-dim),
+      var(--color-purple));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -851,27 +633,27 @@ body {
   animation: fadeUp 0.45s ease-out both;
 }
 
-.stagger > *:nth-child(1) {
+.stagger>*:nth-child(1) {
   animation-delay: 0ms;
 }
 
-.stagger > *:nth-child(2) {
+.stagger>*:nth-child(2) {
   animation-delay: 50ms;
 }
 
-.stagger > *:nth-child(3) {
+.stagger>*:nth-child(3) {
   animation-delay: 100ms;
 }
 
-.stagger > *:nth-child(4) {
+.stagger>*:nth-child(4) {
   animation-delay: 150ms;
 }
 
-.stagger > *:nth-child(5) {
+.stagger>*:nth-child(5) {
   animation-delay: 200ms;
 }
 
-.stagger > *:nth-child(6) {
+.stagger>*:nth-child(6) {
   animation-delay: 250ms;
 }
 
@@ -880,6 +662,7 @@ body {
    ============================================ */
 
 @keyframes typingDot {
+
   0%,
   60%,
   100% {

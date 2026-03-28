@@ -11,24 +11,17 @@ const notion = new Client({
 const SCRAP_DS_ID = process.env.NOTION_SCRAP_DS_ID!;
 
 // データベース ID （作成用）
-// 注意: 新規作成時は database_id ではなく、
-// ページの parent として data_source_id を使う方式に変更
 const SCRAP_DB_ID = process.env.NOTION_SCRAP_DB_ID!;
 
 /* ──────────────────────────────────────────
    Types
    ────────────────────────────────────────── */
-type CreateScrapInput = {
-    title: string;
-    content?: string;
-    category?: string;
-};
-
 type ScrapItem = {
     id: string;
     title: string;
-    content: string;
+    overview: string;
     category?: string | null;
+    status?: string | null;
     createdAt: string;
     url?: string | null;
 };
@@ -88,26 +81,21 @@ export async function getAllScraps(): Promise<ScrapItem[]> {
         console.log("[Scraps] Query result count:", res.results?.length ?? 0);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const items = (res.results ?? []).map((page: any, index: number) => {
+        const items = (res.results ?? []).map((page: any) => {
             const props = page.properties ?? {};
 
             const title = extractTitle(props["タイトル"]);
-            const content = extractRichText(props["内容"]) || extractRichText(props["タイトル"]) || "";
+            const overview = extractRichText(props["概要"]) || "";
             const category = extractSelect(props["種類"]);
+            const status = extractSelect(props["状態"]);
             const createdAt = extractCreatedTime(props["作成日"]);
-
-            console.log(`[Scraps] Item[${index}]:`, {
-                id: page.id,
-                title,
-                category,
-                properties: Object.keys(props),
-            });
 
             return {
                 id: page.id,
                 title,
-                content,
+                overview,
                 category: category || undefined,
+                status: status || undefined,
                 createdAt,
                 url: page.url ?? null,
             };
@@ -116,90 +104,6 @@ export async function getAllScraps(): Promise<ScrapItem[]> {
         return items;
     } catch (err) {
         console.error("[Scraps] getAllScraps error:", err);
-        throw err;
-    }
-}
-
-/* ──────────────────────────────────────────
-   Create Scrap (using database ID)
-   
-   注意: Notion SDK の pages.create では
-   parent に database_id を使う必要があります
-   ────────────────────────────────────────── */
-export async function createScrap(input: CreateScrapInput) {
-    try {
-        if (!SCRAP_DB_ID) {
-            throw new Error(
-                "NOTION_SCRAP_DB_ID is not set in environment variables. " +
-                "Make sure the integration 'Quicka' has access to the database and the ID is correctly set."
-            );
-        }
-
-        console.log("[Scraps] Creating scrap with:", {
-            title: input.title,
-            dbId: SCRAP_DB_ID,
-        });
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const properties: Record<string, any> = {
-            タイトル: {
-                title: [{ text: { content: input.title } }],
-            },
-        };
-
-        // 内容がある場合のみ追加（空の場合はスキップ）
-        if (input.content?.trim()) {
-            properties["内容"] = {
-                rich_text: [{ text: { content: input.content } }],
-            };
-        }
-
-        // カテゴリがある場合のみ追加
-        if (input.category) {
-            properties["種類"] = {
-                select: { name: input.category },
-            };
-        }
-
-        console.log("[Scraps] Properties to create:", properties);
-
-        const response = await notion.pages.create({
-            parent: { database_id: SCRAP_DB_ID },
-            properties: properties as Parameters<
-                typeof notion.pages.create
-            >[0]["properties"],
-        });
-
-        console.log("[Scraps] Scrap created successfully:", response.id);
-
-        return {
-            success: true,
-            scrapId: response.id,
-            url: (response as { url?: string }).url ?? null,
-            title: input.title,
-            category: input.category || null,
-        };
-    } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : String(err);
-        console.error("[Scraps] createScrap error:", errorMsg);
-
-        // より詳しいエラーメッセージ
-        if (errorMsg.includes("not_found") || errorMsg.includes("Could not find database")) {
-            throw new Error(
-                `Notionデータベースが見つかりません。` +
-                `NOTION_SCRAP_DB_ID=${SCRAP_DB_ID} が正しいか確認してください。` +
-                `また、Notion統合 'Quicka' がこのデータベースへのアクセス権限を持つか確認してください。`
-            );
-        }
-
-        if (errorMsg.includes("unauthorized")) {
-            throw new Error(
-                `Notionインテグレーションの権限がありません。` +
-                `Notion の設定で 'Quicka' インテグレーションがスクラップデータベースへの` +
-                `アクセス権限を持つか確認してください。`
-            );
-        }
-
         throw err;
     }
 }
