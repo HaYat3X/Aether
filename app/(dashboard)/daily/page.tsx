@@ -11,7 +11,6 @@ import {
   BookOpen,
   Utensils,
   Zap,
-  CheckCircle2,
   LinkIcon,
   ChevronLeft,
   ChevronRight,
@@ -21,7 +20,7 @@ import {
 } from "lucide-react";
 
 /* ──────────────────────────────────────────
-   Types — Notion「TGP - デイリープラン」DB対応
+   Types
    ────────────────────────────────────────── */
 type DailyPlanStatus = "未着手" | "進行中" | "完了" | "予定変更" | "保留";
 type DailyPlanCategory = "目標関連" | "実務・定常" | "プロジェクト" | "突発・その他" | "雑務";
@@ -55,15 +54,6 @@ function getNowJSTMinutes(): number {
   return jst.getUTCHours() * 60 + jst.getUTCMinutes();
 }
 
-function formatNowTime(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-}
-
-/* ──────────────────────────────────────────
-   Date Helpers
-   ────────────────────────────────────────── */
 function getTodayJST(): string {
   const now = new Date();
   const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
@@ -114,6 +104,7 @@ function getStatusDotClass(status: DailyPlanStatus): string {
     case "進行中": return "status-in-progress";
     case "予定変更": return "status-changed";
     case "保留": return "status-hold";
+    case "未着手": return "status-todo";
     default: return "status-todo";
   }
 }
@@ -124,7 +115,8 @@ function getStatusBadgeClass(status: DailyPlanStatus): string {
     case "進行中": return "badge-status";
     case "予定変更": return "badge-status-changed";
     case "保留": return "badge-status-hold";
-    default: return "badge-status";
+    case "未着手": return "badge-status-todo";
+    default: return "badge-status-todo";
   }
 }
 
@@ -175,6 +167,44 @@ function calcDuration(start: string, end: string): string {
 }
 
 /* ──────────────────────────────────────────
+   TimelineCard — Notion リンク付きカード
+   url があれば <a>、なければ <div> にフォールバック
+   ────────────────────────────────────────── */
+function TimelineCard({
+  item,
+  children,
+  className,
+}: {
+  item: DailyPlanItem;
+  children: React.ReactNode;
+  className: string;
+}) {
+  if (item.url) {
+    return (
+      <a
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`timeline-card ${className}`}
+        style={{ position: "relative" }}
+        title={`Notionで開く: ${item.title}`}
+      >
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <div
+      className={`timeline-card no-link ${className}`}
+      style={{ position: "relative" }}
+    >
+      {children}
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────
    Component
    ────────────────────────────────────────── */
 export default function DailyPlanPage() {
@@ -184,7 +214,6 @@ export default function DailyPlanPage() {
   const [error, setError] = useState<string | null>(null);
   const [nowMinutes, setNowMinutes] = useState(getNowJSTMinutes);
 
-  // 1分ごとに現在時刻を更新
   useEffect(() => {
     const timer = setInterval(() => {
       setNowMinutes(getNowJSTMinutes());
@@ -265,7 +294,7 @@ export default function DailyPlanPage() {
         >
           <RefreshCw
             size={14}
-            style={loading ? { animation: "tspin 1s linear infinite" } : {}}
+            style={loading ? { animation: "spin 1s linear infinite" } : {}}
           />
           更新
         </button>
@@ -314,12 +343,12 @@ export default function DailyPlanPage() {
             const isToday_ = date === getTodayJST();
             let nowLineRendered = false;
 
-            // 独立した now-line（アイテム間に挿入するタイプ）
             const NowLineBetween = (
               <div key="now-line" className="timeline-now-line">
-                <div className="timeline-now-time-col" />
-                <div className="timeline-now-dot-col">
-                  <div className="timeline-now-dot" />
+                <div className="timeline-now-time-col">
+                  <span className="timeline-now-time">
+                    {`${String(Math.floor(nowMinutes / 60)).padStart(2, "0")}:${String(nowMinutes % 60).padStart(2, "0")}`}
+                  </span>
                 </div>
                 <div className="timeline-now-rule" />
               </div>
@@ -330,26 +359,35 @@ export default function DailyPlanPage() {
             items.forEach((item) => {
               const itemStart = item.startTime ? toMinutes(item.startTime) : 0;
               const itemEnd = item.endTime ? toMinutes(item.endTime) : 0;
-              const isNowInside = isToday_ && !nowLineRendered && nowMinutes >= itemStart && nowMinutes < itemEnd && itemEnd > itemStart;
+              const isNowInside =
+                isToday_ &&
+                !nowLineRendered &&
+                nowMinutes >= itemStart &&
+                nowMinutes < itemEnd &&
+                itemEnd > itemStart;
 
-              // アイテムの開始より前に now がある（どのアイテムの中にも入らない隙間）
               if (isToday_ && !nowLineRendered && !isNowInside && nowMinutes < itemStart) {
                 elements.push(NowLineBetween);
                 nowLineRendered = true;
               }
 
-              // now がこのカードの中にある場合、カード内オーバーレイ位置を計算
               const nowPct = isNowInside
                 ? ((nowMinutes - itemStart) / (itemEnd - itemStart)) * 100
                 : -1;
 
-              if (isNowInside) {
-                nowLineRendered = true;
-              }
+              if (isNowInside) nowLineRendered = true;
 
               const current = isCurrent(item);
               const isDone = item.status === "完了";
               const duration = calcDuration(item.startTime, item.endTime);
+
+              const cardClassName = [
+                current ? "is-current" : "",
+                isDone ? "is-done" : "",
+                getCategoryCardClass(item.category),
+              ]
+                .filter(Boolean)
+                .join(" ");
 
               elements.push(
                 <div key={item.id} className="timeline-item">
@@ -361,16 +399,12 @@ export default function DailyPlanPage() {
 
                   {/* Dot */}
                   <div className="timeline-dot-col">
-                    <div className={`timeline-dot ${getStatusDotClass(item.status)}`} />
                   </div>
 
                   {/* Card */}
                   <div className="timeline-content">
-                    <div
-                      className={`timeline-card${current ? " is-current" : ""}${isDone ? " is-done" : ""} ${getCategoryCardClass(item.category)}`}
-                      style={{ position: "relative" }}
-                    >
-                      {/* Now indicator overlay inside the card */}
+                    <TimelineCard item={item} className={cardClassName}>
+                      {/* Now indicator overlay */}
                       {nowPct >= 0 && (
                         <div
                           className="timeline-now-overlay"
@@ -387,9 +421,7 @@ export default function DailyPlanPage() {
                           {getIconComponent(item.icon)}
                         </span>
                         <span className="timeline-card-title">{item.title}</span>
-                        <span
-                          className={`timeline-badge ${getStatusBadgeClass(item.status)}`}
-                        >
+                        <span className={`timeline-badge ${getStatusBadgeClass(item.status)}`}>
                           {item.status}
                         </span>
                         {duration && (
@@ -409,12 +441,12 @@ export default function DailyPlanPage() {
                         {item.relatedTaskIds && item.relatedTaskIds.length > 0 && (
                           <span className="timeline-badge badge-task">
                             <LinkIcon size={10} />
-                            タスク紐づけ {item.relatedTaskIds.length}件
+                            タスク {item.relatedTaskIds.length}件
                           </span>
                         )}
                       </div>
 
-                      {/* Progress bars */}
+                      {/* Progress */}
                       {item.targetProgress != null && (
                         <div className="timeline-progress-row">
                           <span className="timeline-progress-label">目標</span>
@@ -448,13 +480,12 @@ export default function DailyPlanPage() {
                       {item.memo && (
                         <div className="timeline-memo">{item.memo}</div>
                       )}
-                    </div>
+                    </TimelineCard>
                   </div>
                 </div>
               );
             });
 
-            // 全アイテムの後に現在時刻が来る場合
             if (isToday_ && !nowLineRendered) {
               elements.push(NowLineBetween);
             }

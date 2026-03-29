@@ -1,5 +1,6 @@
 /* ============================================
-   Daily Plan Page
+   Daily Plan Page — Light Mode
+   DESIGN.md トークンに完全準拠
    ============================================ */
 
 /* ── Date Navigation ── */
@@ -28,7 +29,7 @@
 
 .daily-nav-btn:hover {
   border-color: var(--color-border-accent);
-  color: var(--color-accent-bright);
+  color: var(--color-accent);
   background: var(--color-accent-glow-subtle);
 }
 
@@ -52,21 +53,25 @@
   letter-spacing: -0.01em;
 }
 
+/* ── Today Button（DESIGN.md 5-7 準拠） ── */
 .daily-today-btn {
   font-size: 11px;
   font-weight: 600;
   padding: 3px 10px;
   border-radius: 6px;
   border: 1px solid var(--color-border-accent);
+  /* rgba(204,85,34,.25) */
   background: var(--color-accent-glow-subtle);
-  color: var(--color-accent-bright);
+  /* rgba(204,85,34,.06) */
+  color: var(--color-accent);
   cursor: pointer;
   transition: all 0.18s ease;
 }
 
 .daily-today-btn:hover {
-  background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.25);
+  background: var(--color-accent-glow-sm);
+  /* rgba(204,85,34,.12) */
+  border-color: var(--color-accent);
 }
 
 /* ── Loading ── */
@@ -93,7 +98,7 @@
 
 .daily-spinner {
   animation: spin 1s linear infinite;
-  color: var(--color-accent-bright);
+  color: var(--color-accent);
 }
 
 /* ── Error ── */
@@ -104,8 +109,8 @@
   gap: 14px;
   padding: 16px 20px;
   border-radius: 14px;
-  background: rgba(248, 113, 113, 0.06);
-  border: 1px solid rgba(248, 113, 113, 0.12);
+  background: rgba(184, 48, 48, 0.05);
+  border: 1px solid rgba(184, 48, 48, 0.12);
   color: var(--color-red);
 }
 
@@ -127,7 +132,7 @@
   font-weight: 600;
   padding: 6px 14px;
   border-radius: 8px;
-  border: 1px solid rgba(248, 113, 113, 0.2);
+  border: 1px solid rgba(184, 48, 48, 0.2);
   background: transparent;
   color: var(--color-red);
   cursor: pointer;
@@ -136,7 +141,7 @@
 }
 
 .daily-retry-btn:hover {
-  background: rgba(248, 113, 113, 0.1);
+  background: rgba(184, 48, 48, 0.08);
 }
 
 /* ── Header Stats ── */
@@ -150,11 +155,15 @@
 .daily-stat-card {
   flex: 1;
   background: var(--color-glass);
+  /* rgba(255,255,255,.70) */
   border: 1px solid var(--color-glass-border);
+  /* rgba(0,0,0,.06) */
   border-radius: 14px;
   padding: 16px 20px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
+  /* ライトモードは blur(8px) */
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .05), 0 4px 12px rgba(0, 0, 0, .03);
   transition: border-color 0.2s ease;
 }
 
@@ -195,7 +204,8 @@
 
 .daily-progress-track {
   height: 6px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.05);
+  /* ライトモード対応 */
   border-radius: 3px;
   overflow: hidden;
   margin-top: 10px;
@@ -204,7 +214,7 @@
 .daily-progress-fill {
   height: 100%;
   border-radius: 3px;
-  background: linear-gradient(90deg, var(--color-accent-dim), var(--color-accent-bright));
+  background: linear-gradient(90deg, var(--color-accent-dim), var(--color-accent));
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -214,7 +224,6 @@
   position: relative;
 }
 
-/* Time ruler on the left */
 .daily-timeline::before {
   content: "";
   position: absolute;
@@ -243,7 +252,6 @@
   padding-bottom: 0;
 }
 
-/* Time column */
 .timeline-time-col {
   width: 54px;
   flex-shrink: 0;
@@ -270,9 +278,8 @@
   line-height: 1;
 }
 
-/* Dot on the line */
 .timeline-dot-col {
-  width: 20px;
+  width: 10px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -288,11 +295,13 @@
   border-radius: 50%;
   flex-shrink: 0;
   border: 2px solid var(--color-bg-base);
+  /* アイボリー背景に合わせる */
 }
 
+/* DESIGN.md 5-7 ステータスドット */
 .timeline-dot.status-done {
   background: var(--color-green);
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.3);
+  box-shadow: 0 0 8px rgba(45, 130, 89, 0.25);
 }
 
 .timeline-dot.status-in-progress {
@@ -307,66 +316,97 @@
 
 .timeline-dot.status-changed {
   background: var(--color-amber);
-  box-shadow: 0 0 8px rgba(251, 191, 36, 0.3);
+  box-shadow: 0 0 8px rgba(192, 122, 32, 0.25);
 }
 
 .timeline-dot.status-hold {
   background: var(--color-purple);
-  box-shadow: 0 0 8px rgba(167, 139, 250, 0.3);
+  box-shadow: 0 0 8px rgba(107, 84, 184, 0.25);
 }
 
+/* DESIGN.md 7 — オレンジ系 pulseGlow */
 @keyframes pulseGlow {
 
   0%,
   100% {
-    box-shadow: 0 0 6px var(--color-accent-glow-sm);
+    box-shadow: 0 0 6px rgba(204, 85, 34, 0.20);
   }
 
   50% {
-    box-shadow: 0 0 14px var(--color-accent-glow);
+    box-shadow: 0 0 14px rgba(204, 85, 34, 0.40);
   }
 }
 
-/* Content card */
+/* ── Content ── */
+
 .timeline-content {
   flex: 1;
   min-width: 0;
   padding: 6px 0 6px 12px;
 }
 
+/* ── Timeline Card ── */
+
 .timeline-card {
   background: var(--color-glass);
   border: 1px solid var(--color-glass-border);
-  border-radius: 12px;
+  border-radius: 11px;
   padding: 14px 16px;
+  position: relative;
   transition: all 0.2s ease;
+  /* クリック可能にする */
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  color: inherit;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+}
+
+.timeline-card:hover {
+  border-color: var(--color-border-hover);
+  /* rgba(0,0,0,.12) */
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .07);
+  transform: translateY(-1px);
+}
+
+.timeline-card:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+}
+
+/* Notion リンクなし（url未設定）の場合はポインターを戻す */
+.timeline-card.no-link {
   cursor: default;
 }
 
-/* Cards with category left-border: slightly adjust left radii */
+.timeline-card.no-link:hover {
+  transform: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+}
+
+/* Cards with category left-border */
 .timeline-card[class*="cat-"] {
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
 }
 
-.timeline-card:hover {
-  border-color: var(--color-border-hover);
-  background: rgba(8, 14, 28, 0.65);
-}
-
+/* DESIGN.md — is-current: ブルーからオレンジに変更 */
 .timeline-card.is-current {
-  border-color: rgba(59, 130, 246, 0.2);
-  background: rgba(59, 130, 246, 0.04);
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.06);
+  border-color: var(--color-border-accent);
+  /* rgba(204,85,34,.25) */
+  background: rgba(204, 85, 34, 0.03);
+  box-shadow: 0 0 20px rgba(204, 85, 34, 0.06);
 }
 
 .timeline-card.is-break {
-  background: rgba(255, 255, 255, 0.01);
+  background: var(--color-bg-elevated);
   border-style: dashed;
-  border-color: rgba(255, 255, 255, 0.04);
+  border-color: var(--color-border);
 }
 
-/* Card header */
+/* ── Card Header ── */
+
 .timeline-card-header {
   display: flex;
   align-items: center;
@@ -378,6 +418,7 @@
   font-size: 16px;
   line-height: 1;
   flex-shrink: 0;
+  color: var(--color-text-muted);
 }
 
 .timeline-card-title {
@@ -391,57 +432,55 @@
   text-overflow: ellipsis;
 }
 
-.timeline-card.is-done .timeline-card-title {
-  color: var(--color-text-muted);
-  text-decoration: line-through;
-}
+/* ── Card Meta ── */
 
-/* Card meta row */
 .timeline-card-meta {
   display: flex;
-  align-items: center;
-  gap: 8px;
   flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
 }
 
-/* Badge */
+/* ── Badge ── */
+
 .timeline-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 11px;
-  font-weight: 500;
   padding: 2px 8px;
   border-radius: 6px;
   line-height: 1.4;
 }
 
+/* DESIGN.md — ステータスバッジ（ブルーからオレンジへ） */
 .timeline-badge.badge-status {
-  background: rgba(59, 130, 246, 0.1);
-  color: var(--color-accent-bright);
+  background: #0076d934;
+  color: #264a72;
 }
 
 .timeline-badge.badge-status-done {
-  background: rgba(52, 211, 153, 0.1);
-  color: var(--color-green);
+  background: #00602628;
+  color: #2a533c;
 }
 
 .timeline-badge.badge-status-changed {
-  background: rgba(251, 191, 36, 0.1);
-  color: var(--color-amber);
+  background: #d1910041;
+  color: #655121;
 }
 
 .timeline-badge.badge-status-hold {
-  background: rgba(167, 139, 250, 0.1);
-  color: var(--color-purple);
+  background: #5c00a324;
+  color: #553b69;
 }
 
-.timeline-badge.badge-task {
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--color-text-muted);
+.timeline-badge.badge-status-todo {
+  background: #1c13011c;
+  color: #494846;
 }
 
-/* Progress in card */
+/* ── Progress in Card ── */
+
 .timeline-progress-row {
   display: flex;
   align-items: center;
@@ -459,7 +498,8 @@
 .timeline-progress-track {
   flex: 1;
   height: 4px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.05);
+  /* ライトモード対応 */
   border-radius: 2px;
   overflow: hidden;
 }
@@ -470,8 +510,9 @@
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* DESIGN.md — fill-target: ブルーからオレンジへ */
 .timeline-progress-fill.fill-target {
-  background: rgba(59, 130, 246, 0.4);
+  background: var(--color-green);
 }
 
 .timeline-progress-fill.fill-actual {
@@ -487,7 +528,8 @@
   text-align: right;
 }
 
-/* Memo */
+/* ── Memo ── */
+
 .timeline-memo {
   font-size: 12px;
   color: var(--color-text-muted);
@@ -495,121 +537,100 @@
   line-height: 1.5;
 }
 
-/* ── Category Card Variants (種類ごとの左ボーダー + 背景) ── */
+/* ── Category Card Variants ── */
 
 .timeline-card.cat-goal {
-  border-left: 3px solid var(--color-accent);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, var(--color-glass) 60%);
-}
-
-.timeline-card.cat-goal:hover {
-  border-left-color: var(--color-accent-bright);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(8, 14, 28, 0.65) 60%);
+  border-left: 3px solid #0076d9;
 }
 
 .timeline-card.cat-routine {
-  border-left: 3px solid var(--color-amber);
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.04) 0%, var(--color-glass) 60%);
-}
-
-.timeline-card.cat-routine:hover {
-  border-left-color: #fcd34d;
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.07) 0%, rgba(8, 14, 28, 0.65) 60%);
+  border-left: 3px solid #d19100;
 }
 
 .timeline-card.cat-project {
-  border-left: 3px solid var(--color-red);
-  background: linear-gradient(135deg, rgba(248, 113, 113, 0.04) 0%, var(--color-glass) 60%);
-}
-
-.timeline-card.cat-project:hover {
-  border-left-color: #fca5a5;
-  background: linear-gradient(135deg, rgba(248, 113, 113, 0.07) 0%, rgba(8, 14, 28, 0.65) 60%);
+  border-left: 3px solid #ce1800;
 }
 
 .timeline-card.cat-adhoc {
   border-left: 3px solid var(--color-purple);
-  background: linear-gradient(135deg, rgba(167, 139, 250, 0.04) 0%, var(--color-glass) 60%);
-}
-
-.timeline-card.cat-adhoc:hover {
-  border-left-color: #c4b5fd;
-  background: linear-gradient(135deg, rgba(167, 139, 250, 0.07) 0%, rgba(8, 14, 28, 0.65) 60%);
 }
 
 .timeline-card.cat-misc {
-  border-left: 3px solid var(--color-text-muted);
-  background: linear-gradient(135deg, rgba(62, 76, 99, 0.06) 0%, var(--color-glass) 60%);
+  border-left: 3px solid #1c1301;
 }
 
-.timeline-card.cat-misc:hover {
-  border-left-color: var(--color-text-secondary);
-  background: linear-gradient(135deg, rgba(62, 76, 99, 0.1) 0%, rgba(8, 14, 28, 0.65) 60%);
-}
-
-/* Override: is-current glow should complement category color */
+/* is-current + category */
 .timeline-card.is-current.cat-goal {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.08);
+  box-shadow: 0 0 20px rgba(204, 85, 34, 0.08);
 }
 
 .timeline-card.is-current.cat-routine {
-  border-color: rgba(251, 191, 36, 0.25);
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.06);
+  border-color: rgba(192, 122, 32, 0.25);
+  box-shadow: 0 0 20px rgba(192, 122, 32, 0.06);
 }
 
 .timeline-card.is-current.cat-project {
-  border-color: rgba(248, 113, 113, 0.25);
-  box-shadow: 0 0 20px rgba(248, 113, 113, 0.06);
+  border-color: rgba(184, 48, 48, 0.25);
+  box-shadow: 0 0 20px rgba(184, 48, 48, 0.06);
 }
 
 .timeline-card.is-current.cat-adhoc {
-  border-color: rgba(167, 139, 250, 0.25);
-  box-shadow: 0 0 20px rgba(167, 139, 250, 0.06);
+  border-color: rgba(107, 84, 184, 0.25);
+  box-shadow: 0 0 20px rgba(107, 84, 184, 0.06);
 }
 
 .timeline-card.is-current.cat-misc {
-  border-color: rgba(62, 76, 99, 0.3);
-  box-shadow: 0 0 20px rgba(62, 76, 99, 0.06);
+  border-color: rgba(138, 131, 122, 0.25);
+  box-shadow: 0 0 20px rgba(138, 131, 122, 0.06);
 }
 
-/* Completed cards: mute the category left border */
+/* Completed cards */
+.timeline-card.is-done {
+  opacity: 0.72;
+}
+
 .timeline-card.is-done.cat-goal,
 .timeline-card.is-done.cat-routine,
 .timeline-card.is-done.cat-project,
 .timeline-card.is-done.cat-adhoc,
 .timeline-card.is-done.cat-misc {
-  border-left-color: rgba(255, 255, 255, 0.06);
+  border-left-color: var(--color-border);
   background: var(--color-glass);
+}
+
+.timeline-card.is-done .timeline-card-title {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
 }
 
 /* ── Category Badge Variants ── */
 
 .timeline-badge.badge-cat-goal {
-  background: rgba(59, 130, 246, 0.12);
-  color: var(--color-accent-bright);
+  background: #0076d934;
+  color: #264a72;
 }
 
 .timeline-badge.badge-cat-routine {
-  background: rgba(251, 191, 36, 0.12);
-  color: var(--color-amber);
+  background: #d1910041;
+  color: #655121;
 }
 
 .timeline-badge.badge-cat-project {
-  background: rgba(248, 113, 113, 0.12);
-  color: var(--color-red);
+  background: #ce18002a;
+  color: #6d3531;
 }
 
 .timeline-badge.badge-cat-adhoc {
-  background: rgba(167, 139, 250, 0.12);
-  color: var(--color-purple);
+  background: #5c00a324;
+  color: #553b69;
 }
 
 .timeline-badge.badge-cat-misc {
-  background: rgba(62, 76, 99, 0.15);
-  color: var(--color-text-secondary);
+  background: #1c13011c;
+  color: #494846;
 }
 
-/* ── Empty state ── */
+/* ── Empty State ── */
 
 .daily-empty {
   text-align: center;
@@ -621,11 +642,11 @@
   height: 48px;
   border-radius: 14px;
   background: var(--color-accent-glow-subtle);
-  border: 1px solid rgba(59, 130, 246, 0.1);
+  border: 1px solid var(--color-border-accent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-accent-bright);
+  color: var(--color-accent);
   margin-bottom: 14px;
 }
 
@@ -642,9 +663,8 @@
   line-height: 1.6;
 }
 
-/* ── Current Time Indicator (Now Line) ── */
+/* ── Now Line (Between items) ── */
 
-/* Between-items version (used when now falls between two cards) */
 .timeline-now-line {
   position: relative;
   display: flex;
@@ -686,20 +706,19 @@
   height: 10px;
   border-radius: 50%;
   background: var(--color-red);
-  box-shadow: 0 0 8px rgba(248, 113, 113, 0.5), 0 0 16px rgba(248, 113, 113, 0.2);
-  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(184, 48, 48, 0.4), 0 0 16px rgba(184, 48, 48, 0.15);
 }
 
 .timeline-now-rule {
   flex: 1;
   height: 2px;
   background: var(--color-red);
-  box-shadow: 0 0 6px rgba(248, 113, 113, 0.3);
+  box-shadow: 0 0 6px rgba(184, 48, 48, 0.2);
   border-radius: 1px;
   margin-right: 4px;
 }
 
-/* In-card overlay version (used when now falls inside a card's time range) */
+/* In-card overlay */
 .timeline-now-overlay {
   position: absolute;
   left: 0;
@@ -716,7 +735,7 @@
   height: 8px;
   border-radius: 50%;
   background: var(--color-red);
-  box-shadow: 0 0 6px rgba(248, 113, 113, 0.5);
+  box-shadow: 0 0 6px rgba(184, 48, 48, 0.4);
   flex-shrink: 0;
   position: relative;
   z-index: 1;
@@ -727,11 +746,11 @@
   flex: 1;
   height: 1.5px;
   background: var(--color-red);
-  box-shadow: 0 0 6px rgba(248, 113, 113, 0.3);
+  box-shadow: 0 0 6px rgba(184, 48, 48, 0.2);
   border-radius: 1px;
 }
 
-/* ── Stagger delays for timeline items ── */
+/* ── Stagger Delays ── */
 
 .timeline-item:nth-child(1) {
   animation-delay: 0ms;
@@ -781,6 +800,8 @@
   animation-delay: 440ms;
 }
 
+/* ── Refresh Button ── */
+
 .refresh-btn {
   margin-left: auto;
   display: flex;
@@ -800,6 +821,6 @@
 
 .refresh-btn:hover {
   border-color: var(--color-border-accent);
-  color: var(--color-accent-bright);
+  color: var(--color-accent);
   background: var(--color-accent-glow-subtle);
 }
