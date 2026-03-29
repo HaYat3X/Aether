@@ -1,5 +1,5 @@
 /* ============================================
-   Trend Page — Editorial Intelligence Feed
+   Trend Page — Light Mode (DESIGN.md準拠)
    ============================================ */
 
 /* ── Header ── */
@@ -8,7 +8,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 24px;
+  /* margin-bottom: 12px; */
   gap: 16px;
   flex-wrap: wrap;
 }
@@ -17,6 +17,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin-bottom: 10px;
 }
 
 .trend-last-updated {
@@ -33,16 +34,22 @@
   height: 6px;
   border-radius: 50%;
   background: var(--color-green);
-  box-shadow: 0 0 6px rgba(52, 211, 153, 0.5);
+  /* ライトモード: グローは控えめ（DESIGN.md §1 "発光エフェクトは使わない"） */
+  box-shadow: 0 0 4px rgba(45, 130, 89, 0.35);
   flex-shrink: 0;
+}
+
+.trend-last-updated-dot.stale {
+  background: var(--color-amber);
+  box-shadow: 0 0 4px rgba(192, 122, 32, 0.35);
 }
 
 .trend-cache-badge {
   font-size: 10px;
   padding: 1px 7px;
   border-radius: 5px;
-  background: rgba(251, 191, 36, 0.08);
-  border: 1px solid rgba(251, 191, 36, 0.18);
+  background: rgba(192, 122, 32, 0.08);
+  border: 1px solid rgba(192, 122, 32, 0.18);
   color: var(--color-amber);
 }
 
@@ -51,38 +58,37 @@
   font-weight: 600;
   padding: 5px 12px;
   border-radius: 8px;
-  background: rgba(52, 211, 153, 0.08);
-  border: 1px solid rgba(52, 211, 153, 0.18);
+  background: rgba(45, 130, 89, 0.08);
+  border: 1px solid rgba(45, 130, 89, 0.18);
   color: var(--color-green);
 }
 
 .trend-force-btn {
-  padding: 6px 12px;
-  border-radius: 8px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 13px;
+  border-radius: 9px;
   border: 1px solid var(--color-border);
   background: transparent;
   color: var(--color-text-muted);
-  font-size: 11px;
-  font-weight: 500;
-  font-family: inherit;
   cursor: pointer;
   transition: all 0.18s ease;
+  font-family: inherit;
 }
 
 .trend-force-btn:hover:not(:disabled) {
-  border-color: var(--color-amber);
+  border-color: rgba(192, 122, 32, 0.35);
   color: var(--color-amber);
-  background: rgba(251, 191, 36, 0.06);
+  background: rgba(192, 122, 32, 0.06);
 }
 
 .trend-force-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-}
-
-.trend-last-updated-dot.stale {
-  background: var(--color-amber);
-  box-shadow: 0 0 6px rgba(251, 191, 36, 0.4);
 }
 
 .trend-header-actions {
@@ -110,9 +116,12 @@
 }
 
 .trend-fetch-btn:hover:not(:disabled) {
-  border-color: var(--color-accent);
-  color: var(--color-accent-bright);
+  border-color: var(--color-border-accent);
+  /* rgba(204,85,34,.25) */
+  color: var(--color-accent);
+  /* #cc5522 */
   background: var(--color-accent-glow-subtle);
+  /* rgba(204,85,34,.06) */
 }
 
 .trend-fetch-btn:disabled {
@@ -121,8 +130,8 @@
 }
 
 .trend-fetch-btn.fetching {
-  border-color: var(--color-accent);
-  color: var(--color-accent-bright);
+  border-color: var(--color-border-accent);
+  color: var(--color-accent);
   background: var(--color-accent-glow-subtle);
 }
 
@@ -143,8 +152,10 @@
   padding: 5px 12px;
   border-radius: 8px;
   border: 1px solid var(--color-border);
+  /* rgba(0,0,0,.07) */
   background: transparent;
   color: var(--color-text-muted);
+  /* #8a837a */
   font-size: 12px;
   font-weight: 500;
   font-family: inherit;
@@ -155,13 +166,18 @@
 
 .trend-filter-btn:hover {
   border-color: var(--color-border-hover);
+  /* rgba(0,0,0,.12) */
   color: var(--color-text-secondary);
+  /* #4a4440 */
 }
 
 .trend-filter-btn.active {
   border-color: var(--color-border-accent);
+  /* rgba(204,85,34,.25) */
   color: var(--color-accent-bright);
+  /* #b84a1a */
   background: var(--color-accent-glow-subtle);
+  /* rgba(204,85,34,.06) */
 }
 
 .trend-filter-count {
@@ -171,14 +187,16 @@
   padding: 1px 5px;
   border-radius: 4px;
   background: var(--color-bg-elevated);
+  /* #faf9f6 */
   border: 1px solid var(--color-border);
   color: var(--color-text-muted);
   line-height: 1.4;
 }
 
 .trend-filter-btn.active .trend-filter-count {
-  background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.2);
+  background: var(--color-accent-glow-sm);
+  /* rgba(204,85,34,.12) */
+  border-color: var(--color-border-accent);
   color: var(--color-accent-bright);
 }
 
@@ -199,11 +217,12 @@
   height: 52px;
   border-radius: 16px;
   background: var(--color-accent-glow-subtle);
-  border: 1px solid rgba(59, 130, 246, 0.12);
+  border: 1px solid var(--color-border-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-accent-bright);
+  color: var(--color-accent);
+  animation: trend-pulse 1.8s ease-in-out infinite;
 }
 
 @keyframes trend-pulse {
@@ -220,19 +239,17 @@
   }
 }
 
-.trend-loading-icon {
-  animation: trend-pulse 1.8s ease-in-out infinite;
-}
-
 .trend-loading-title {
   font-size: 15px;
   font-weight: 600;
   color: var(--color-text-primary);
+  /* #1a1714 */
 }
 
 .trend-loading-desc {
   font-size: 12px;
   color: var(--color-text-muted);
+  /* #8a837a */
   line-height: 1.6;
 }
 
@@ -264,7 +281,8 @@
   display: inline-block;
   width: 8px;
   height: 14px;
-  background: var(--color-accent-bright);
+  background: var(--color-accent);
+  /* #cc5522 */
   border-radius: 2px;
   animation: blink 1s ease-in-out infinite;
 }
@@ -277,8 +295,9 @@
   gap: 14px;
   padding: 16px 20px;
   border-radius: 14px;
-  background: rgba(248, 113, 113, 0.06);
-  border: 1px solid rgba(248, 113, 113, 0.12);
+  background: rgba(184, 48, 48, 0.05);
+  /* --color-red ベース */
+  border: 1px solid rgba(184, 48, 48, 0.12);
   color: var(--color-red);
 }
 
@@ -300,7 +319,7 @@
   font-weight: 600;
   padding: 6px 14px;
   border-radius: 8px;
-  border: 1px solid rgba(248, 113, 113, 0.2);
+  border: 1px solid rgba(184, 48, 48, 0.2);
   background: transparent;
   color: var(--color-red);
   cursor: pointer;
@@ -310,7 +329,7 @@
 }
 
 .trend-retry-btn:hover {
-  background: rgba(248, 113, 113, 0.1);
+  background: rgba(184, 48, 48, 0.08);
 }
 
 /* ── Empty State ── */
@@ -325,11 +344,11 @@
   height: 56px;
   border-radius: 16px;
   background: var(--color-accent-glow-subtle);
-  border: 1px solid rgba(59, 130, 246, 0.1);
+  border: 1px solid var(--color-border-accent);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-accent-bright);
+  color: var(--color-accent);
   margin-bottom: 16px;
 }
 
@@ -353,15 +372,20 @@
 .trend-featured {
   position: relative;
   background: var(--color-glass);
+  /* rgba(255,255,255,0.70) */
   border: 1px solid var(--color-glass-border);
+  /* rgba(0,0,0,.06) */
   border-radius: 16px;
   padding: 24px 28px;
   margin-bottom: 20px;
   overflow: hidden;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   animation: fadeUp 0.45s ease-out both;
+  /* ライトモードではbox-shadowで浮遊感を出す（DESIGN.md §5-3） */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .05), 0 4px 12px rgba(0, 0, 0, .03);
 }
 
+/* アクセントラインをオレンジに（DESIGN.md §5 アクセントカラー一貫性） */
 .trend-featured::before {
   content: "";
   position: absolute;
@@ -374,22 +398,33 @@
       var(--color-accent) 40%,
       var(--color-accent-bright) 60%,
       transparent 100%);
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 .trend-featured:hover {
   border-color: var(--color-border-hover);
+  /* rgba(0,0,0,.12) */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .07), 0 8px 24px rgba(0, 0, 0, .04);
+}
+
+/* URLがある場合はクリッカブル */
+.trend-featured.has-url {
+  cursor: pointer;
+}
+
+.trend-featured.has-url:hover {
+  color: var(--color-accent);
 }
 
 .trend-featured-label {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--color-accent-bright);
+  color: var(--color-accent);
   margin-bottom: 12px;
 }
 
@@ -400,6 +435,7 @@
   height: 6px;
   border-radius: 50%;
   background: var(--color-accent);
+  /* ライトモードのpulseGlowはオレンジ系（DESIGN.md §7） */
   box-shadow: 0 0 6px var(--color-accent-glow-sm);
 }
 
@@ -408,15 +444,18 @@
   font-size: 20px;
   font-weight: 800;
   color: var(--color-text-primary);
+  /* #1a1714 */
   line-height: 1.35;
   letter-spacing: -0.02em;
   margin-bottom: 10px;
+  transition: color 0.18s ease;
 }
 
 .trend-featured-summary {
   font-size: 13.5px;
   line-height: 1.7;
   color: var(--color-text-secondary);
+  /* #4a4440 */
   margin-bottom: 16px;
   max-width: 800px;
 }
@@ -440,7 +479,9 @@
 
 .trend-card {
   background: var(--color-glass);
+  /* rgba(255,255,255,0.70) */
   border: 1px solid var(--color-glass-border);
+  /* rgba(0,0,0,.06) */
   border-radius: 14px;
   padding: 18px 20px;
   display: flex;
@@ -451,6 +492,13 @@
   position: relative;
   overflow: hidden;
   cursor: default;
+  /* ライトモード用 box-shadow（DESIGN.md §5-3） */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04), 0 2px 8px rgba(0, 0, 0, .02);
+}
+
+/* URLありのカードはクリッカブル */
+.trend-card.has-url {
+  cursor: pointer;
 }
 
 .trend-card::before {
@@ -467,42 +515,21 @@
 
 .trend-card:hover {
   border-color: var(--color-border-hover);
-  background: rgba(8, 14, 28, 0.65);
+  /* rgba(0,0,0,.12) */
+  /* ライトモード: 暗くせず浮かせる（ダーク版の rgba(8,14,28,0.65) は使わない） */
+  background: var(--color-bg-surface);
+  /* #ffffff */
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .06), 0 8px 24px rgba(0, 0, 0, .03);
 }
 
 .trend-card:hover::before {
   opacity: 1;
 }
 
-/* Category left-border colors */
-.trend-card.cat-ai::before {
-  background: var(--color-accent);
-  box-shadow: 2px 0 8px rgba(59, 130, 246, 0.4);
-}
-
-.trend-card.cat-tech::before {
-  background: var(--color-purple);
-  box-shadow: 2px 0 8px rgba(167, 139, 250, 0.4);
-}
-
-.trend-card.cat-business::before {
-  background: var(--color-amber);
-  box-shadow: 2px 0 8px rgba(251, 191, 36, 0.4);
-}
-
-.trend-card.cat-science::before {
-  background: var(--color-green);
-  box-shadow: 2px 0 8px rgba(52, 211, 153, 0.4);
-}
-
-.trend-card.cat-world::before {
-  background: var(--color-pink);
-  box-shadow: 2px 0 8px rgba(244, 114, 182, 0.4);
-}
-
-.trend-card.cat-other::before {
-  background: var(--color-text-muted);
+/* URLありカードのタイトルホバー */
+.trend-card.has-url:hover {
+  color: var(--color-accent);
 }
 
 /* Card header */
@@ -517,11 +544,14 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--color-text-primary);
+  /* #1a1714 */
   line-height: 1.45;
   flex: 1;
   letter-spacing: -0.01em;
+  transition: color 0.18s ease;
 }
 
+/* Impact score — ライトモード調整 */
 .trend-impact-score {
   display: flex;
   align-items: center;
@@ -537,19 +567,19 @@
 }
 
 .trend-impact-score.score-high {
-  background: rgba(248, 113, 113, 0.12);
+  background: rgba(184, 48, 48, 0.08);
   color: var(--color-red);
-  border: 1px solid rgba(248, 113, 113, 0.2);
+  border: 1px solid rgba(184, 48, 48, 0.16);
 }
 
 .trend-impact-score.score-medium {
-  background: rgba(251, 191, 36, 0.10);
+  background: rgba(192, 122, 32, 0.08);
   color: var(--color-amber);
-  border: 1px solid rgba(251, 191, 36, 0.2);
+  border: 1px solid rgba(192, 122, 32, 0.18);
 }
 
 .trend-impact-score.score-low {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--color-bg-elevated);
   color: var(--color-text-muted);
   border: 1px solid var(--color-border);
 }
@@ -559,6 +589,8 @@
   font-size: 12.5px;
   line-height: 1.65;
   color: var(--color-text-secondary);
+  /* #4a4440 */
+  flex: 1;
 }
 
 /* Card footer */
@@ -568,16 +600,33 @@
   gap: 6px;
   flex-wrap: wrap;
   padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  /* ライトモード: rgba(255,255,255,0.03) は白背景で見えないので border に変更 */
+  border-top: 1px solid var(--color-border);
+  /* rgba(0,0,0,.07) */
 }
 
-/* Badges */
+/* URL indicator（カードフッター右端） */
+.trend-card-url-indicator {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--color-text-dim);
+  /* #b8b0a8 */
+  transition: color 0.18s ease;
+}
+
+.trend-card.has-url:hover .trend-card-url-indicator {
+  color: var(--color-accent);
+}
+
+/* Badges — ライトモード調整 */
 .trend-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 10px;
-  font-weight: 600;
   padding: 2px 8px;
   border-radius: 5px;
   white-space: nowrap;
@@ -585,38 +634,57 @@
   letter-spacing: 0.02em;
 }
 
+/* AI = オレンジ（ダークの青から変更。DESIGN.md §5 "ブルーを完全にオレンジへ"） */
 .trend-badge-ai {
-  background: rgba(59, 130, 246, 0.10);
-  color: var(--color-accent-bright);
+  background: #ce18002a;
+  color: #6d3531;
 }
 
 .trend-badge-tech {
-  background: rgba(167, 139, 250, 0.10);
-  color: var(--color-purple);
+  background: #0076d934;
+  color: #264a72;
 }
 
 .trend-badge-business {
-  background: rgba(251, 191, 36, 0.10);
-  color: var(--color-amber);
+  background: #d1910041;
+  color: #655121;
 }
 
 .trend-badge-science {
-  background: rgba(52, 211, 153, 0.10);
-  color: var(--color-green);
+  background: #00602628;
+  color: #2a533c;
 }
 
 .trend-badge-world {
-  background: rgba(244, 114, 182, 0.10);
+  background: rgba(184, 48, 96, 0.08);
   color: var(--color-pink);
 }
 
 .trend-badge-other {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--color-bg-elevated);
   color: var(--color-text-muted);
 }
 
 .trend-badge-keyword {
-  background: rgba(255, 255, 255, 0.04);
+  background: #1c13011c;
+  color: #494846;
+}
+
+/* impact score badge (featured meta) */
+.trend-badge.score-high {
+  background: rgba(184, 48, 48, 0.08);
+  color: var(--color-red);
+  border: 1px solid rgba(184, 48, 48, 0.16);
+}
+
+.trend-badge.score-medium {
+  background: rgba(192, 122, 32, 0.08);
+  color: var(--color-amber);
+  border: 1px solid rgba(192, 122, 32, 0.18);
+}
+
+.trend-badge.score-low {
+  background: var(--color-bg-elevated);
   color: var(--color-text-muted);
   border: 1px solid var(--color-border);
 }
@@ -631,6 +699,7 @@
   margin-bottom: 20px;
   animation: fadeUp 0.45s ease-out both;
   animation-delay: 60ms;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .04), 0 2px 8px rgba(0, 0, 0, .02);
 }
 
 .trend-digest-header {
@@ -644,12 +713,16 @@
   width: 30px;
   height: 30px;
   border-radius: 8px;
+  /* ダーク版の青をオレンジ系に（DESIGN.md §5-2 PageHeader と同パターン） */
   background: var(--color-accent-glow-subtle);
-  border: 1px solid rgba(59, 130, 246, 0.1);
+  /* rgba(204,85,34,.06) */
+  border: 1px solid var(--color-border-accent);
+  /* rgba(204,85,34,.25) */
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-accent-bright);
+  color: var(--color-accent);
+  /* #cc5522 */
   flex-shrink: 0;
 }
 
@@ -659,12 +732,14 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-text-muted);
+  /* #8a837a */
 }
 
 .trend-digest-body {
   font-size: 13px;
   line-height: 1.75;
   color: var(--color-text-secondary);
+  /* #4a4440 */
 }
 
 /* ── Stagger animation delays ── */
