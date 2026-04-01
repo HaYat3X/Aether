@@ -12,7 +12,9 @@ import {
   Settings,
   Blocks,
   Bot,
-  TowelRack
+  TowelRack,
+  TrendingUp,
+  ListChecks
 } from "lucide-react";
 
 type PageMeta = {
@@ -32,19 +34,14 @@ type Notification = {
 
 const PAGE_META: Record<string, PageMeta> = {
   "/chat": {
-    title: "AI Assistant",
-    subtitle: "AIアシスタントとチャット",
+    title: "AIアシスタント",
+    subtitle: "AIアシスタント「Luno」とチャット",
     icon: Bot,
   },
-  "/schedule": {
-    title: "Schedule",
-    subtitle: "週間スケジュール",
-    icon: Calendar,
-  },
-  "/tasks": { title: "Tasks", subtitle: "タスク管理", icon: CheckSquare },
-  "/daily": { title: "Daily Plan", subtitle: "今日のプラン", icon: Clock },
-  "/scraps": { title: "Scraps", subtitle: "アイデアメモ", icon: TowelRack },
-  "/settings": { title: "Settings", subtitle: "設定", icon: Settings },
+  "/tasks": { title: "タスク", subtitle: "今週のタスク一覧", icon: ListChecks },
+  "/daily": { title: "行動プラン", subtitle: "今日の行動プラン", icon: Clock },
+  "/scraps": { title: "スクラップ", subtitle: "アイデアや気になることなどの一時メモ", icon: TowelRack },
+  "/trends": { title: "トレンド", subtitle: "今週の最新トレンド", icon: TrendingUp },
   "/integrations": {
     title: "Integrations",
     subtitle: "外部サービス連携",
@@ -54,22 +51,14 @@ const PAGE_META: Record<string, PageMeta> = {
 
 function getToday() {
   const d = new Date();
-  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
-  return `${weekdays[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}`;
+  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+
+  const year = d.getFullYear();
+  const month = d.getMonth() + 1;
+  const date = d.getDate();
+  const day = weekdays[d.getDay()];
+
+  return `${year}年${month}月${date}日（${day}）`;
 }
 
 export default function PageHeader() {

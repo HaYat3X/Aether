@@ -19,7 +19,7 @@ export default async function LoginPage({
           <div className="login-logo-icon">
             <Image src="/login.png" alt="Lumo" width={64} height={64} />
           </div>
-          <span className="login-app-name">Lumo</span>
+          <span className="login-app-name">Luno</span>
         </div>
 
         {/* ── タグライン ── */}

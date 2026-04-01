@@ -13,6 +13,7 @@ import {
   FlaskConical,
   Layers,
   Sparkles,
+  ExternalLink,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
@@ -25,6 +26,7 @@ type TrendItem = {
   category: TrendCategory;
   impactScore: number;
   keywords: string[];
+  sourceUrl?: string;    // ← 追加
   isFeatured?: boolean;
 };
 
@@ -36,7 +38,7 @@ type TrendResponse = {
 
 // ── Cache ──────────────────────────────────────────────────
 const CACHE_KEY = "aether_trends_cache";
-const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7日
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 function loadCache(): TrendResponse | null {
   try {
@@ -99,12 +101,15 @@ function daysUntilExpiry(isoStr: string): number {
   return Math.max(0, Math.ceil((CACHE_TTL_MS - age) / (24 * 60 * 60 * 1000)));
 }
 
+/** URLをクリックで新タブ展開 */
+function openUrl(url: string | undefined) {
+  if (!url) return;
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
 // ── Page ────────────────────────────────────────────────────
 export default function TrendPage() {
-  // mounted が false の間はSSRと同じ「空」状態を返す
-  // → サーバー/クライアントのHTML不一致（Hydration error）を防ぐ
   const [mounted, setMounted] = useState(false);
-
   const [data, setData] = useState<TrendResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -119,7 +124,6 @@ export default function TrendPage() {
     "まとめを生成中...",
   ];
 
-  // ── マウント後にキャッシュ読み込み（SSR後のクライアント専用処理）──
   useEffect(() => {
     setMounted(true);
     const cached = loadCache();
@@ -129,7 +133,6 @@ export default function TrendPage() {
     }
   }, []);
 
-  // ── API から取得 ──
   const fetchTrends = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -159,11 +162,7 @@ export default function TrendPage() {
     }
   }, []);
 
-  // ── マウント前はSSRと同じ空レンダリング ──
-  // これがないとサーバー（data=null）とクライアント（data=cached）でHTMLが食い違う
-  if (!mounted) {
-    return null; // SSR時は何もレンダリングしない → Hydration不一致を防ぐ
-  }
+  if (!mounted) return null;
 
   // ── フィルター ──────────────────────────────────────────
   const filteredItems = (data?.items ?? []).filter(
@@ -187,26 +186,58 @@ export default function TrendPage() {
   return (
     <div className="stagger">
       {/* ── Header ── */}
+      <div className="trend-header-left">
+        {data && (
+          <div className="trend-last-updated">
+            <span className={`trend-last-updated-dot${daysLeft <= 1 ? " stale" : ""}`} />
+            {formatFetchedAt(data.fetchedAt)}
+            {fromCache && (
+              <span className="trend-cache-badge">
+                キャッシュ（あと{daysLeft}日）
+              </span>
+            )}
+          </div>
+        )}
+        {!data && !loading && (
+          <div className="trend-last-updated">
+            <span className="trend-last-updated-dot stale" />
+            未取得 — 週1回の更新
+          </div>
+        )}
+      </div>
+
       <div className="trend-header animate-fade-up">
-        <div className="trend-header-left">
-          {data && (
-            <div className="trend-last-updated">
-              <span className={`trend-last-updated-dot${daysLeft <= 1 ? " stale" : ""}`} />
-              {formatFetchedAt(data.fetchedAt)}
-              {fromCache && (
-                <span className="trend-cache-badge">
-                  キャッシュ（あと{daysLeft}日）
-                </span>
-              )}
-            </div>
-          )}
-          {!data && !loading && (
-            <div className="trend-last-updated">
-              <span className="trend-last-updated-dot stale" />
-              未取得 — 週1回の更新
-            </div>
-          )}
-        </div>
+        {/* ── Category Filters ── */}
+        {!loading && data && (
+          <div className="trend-filters animate-fade-up">
+            <button
+              className={`trend-filter-btn${activeCategory === "All" ? " active" : ""}`}
+              onClick={() => setActiveCategory("All")}
+            >
+              <TrendingUp size={12} />
+              すべて
+              <span className="trend-filter-count">{data.items.length}</span>
+            </button>
+            {ALL_CATEGORIES.map((cat) => {
+              const cfg = CATEGORY_CONFIG[cat];
+              const Icon = cfg.icon;
+              const count = categoryCounts[cat] ?? 0;
+              if (count === 0) return null;
+              return (
+                <button
+                  key={cat}
+                  className={`trend-filter-btn${activeCategory === cat ? " active" : ""}`}
+                  onClick={() => setActiveCategory(cat)}
+                >
+                  <Icon size={12} />
+                  {cfg.label}
+                  <span className="trend-filter-count">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         <div className="trend-header-actions">
           {fromCache && data && (
             <button
@@ -215,6 +246,10 @@ export default function TrendPage() {
               disabled={loading}
               title="キャッシュを無視して強制更新（API使用量あり）"
             >
+              <RefreshCw
+                size={13}
+                style={loading ? { animation: "tspin 1s linear infinite" } : {}}
+              />
               強制更新
             </button>
           )}
@@ -235,37 +270,6 @@ export default function TrendPage() {
           )}
         </div>
       </div>
-
-      {/* ── Category Filters ── */}
-      {!loading && data && (
-        <div className="trend-filters animate-fade-up">
-          <button
-            className={`trend-filter-btn${activeCategory === "All" ? " active" : ""}`}
-            onClick={() => setActiveCategory("All")}
-          >
-            <TrendingUp size={12} />
-            すべて
-            <span className="trend-filter-count">{data.items.length}</span>
-          </button>
-          {ALL_CATEGORIES.map((cat) => {
-            const cfg = CATEGORY_CONFIG[cat];
-            const Icon = cfg.icon;
-            const count = categoryCounts[cat] ?? 0;
-            if (count === 0) return null;
-            return (
-              <button
-                key={cat}
-                className={`trend-filter-btn${activeCategory === cat ? " active" : ""}`}
-                onClick={() => setActiveCategory(cat)}
-              >
-                <Icon size={12} />
-                {cfg.label}
-                <span className="trend-filter-count">{count}</span>
-              </button>
-            );
-          })}
-        </div>
-      )}
 
       {/* ── Loading ── */}
       {loading && (
@@ -338,8 +342,14 @@ export default function TrendPage() {
 
       {/* ── Featured ── */}
       {!loading && featuredItem && (
-        <div className="trend-featured">
-          <div className="trend-featured-label">Top Trend</div>
+        <div
+          className={`trend-featured${featuredItem.sourceUrl ? " has-url" : ""}`}
+          onClick={() => openUrl(featuredItem.sourceUrl)}
+          title={featuredItem.sourceUrl ? "クリックして記事を開く" : undefined}
+        >
+          <div className="trend-featured-label">
+            Top Trend
+          </div>
           <div className="trend-featured-title">{featuredItem.title}</div>
           <div className="trend-featured-summary">{featuredItem.summary}</div>
           <div className="trend-featured-meta">
@@ -353,12 +363,6 @@ export default function TrendPage() {
                 </span>
               );
             })()}
-            <span
-              className={`trend-badge ${getImpactClass(featuredItem.impactScore)}`}
-              style={{ padding: "2px 8px" }}
-            >
-              Impact {featuredItem.impactScore}/10
-            </span>
             {featuredItem.keywords.slice(0, 3).map((kw) => (
               <span key={kw} className="trend-badge trend-badge-keyword">
                 {kw}
@@ -375,7 +379,12 @@ export default function TrendPage() {
             const cfg = CATEGORY_CONFIG[item.category];
             const Icon = cfg.icon;
             return (
-              <div key={item.id} className={`trend-card ${cfg.cardClass}`}>
+              <div
+                key={item.id}
+                className={`trend-card ${cfg.cardClass}${item.sourceUrl ? " has-url" : ""}`}
+                onClick={() => openUrl(item.sourceUrl)}
+                title={item.sourceUrl ? "クリックして記事を開く" : undefined}
+              >
                 <div className="trend-card-header">
                   <div className="trend-card-title">{item.title}</div>
                   <div className={`trend-impact-score ${getImpactClass(item.impactScore)}`}>

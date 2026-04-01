@@ -22,10 +22,7 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: {
-    default: "Lumo",
-    template: "Lumo | %s",
-  },
+  title: "Luno | AI秘書",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" }, // モダンブラウザ（OS設定に自動追従）

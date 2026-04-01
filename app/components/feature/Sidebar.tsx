@@ -23,6 +23,7 @@ import {
   TrendingUp,
   ChevronsLeft,
   ChevronsRight,
+  ListChecks,
   TowelRack
 } from "lucide-react";
 import { NavSection } from "../ui/NavSection/NavSection";
@@ -36,16 +37,16 @@ const MAIN_NAV: NavItem[] = [
   {
     href: "/chat",
     icon: Bot,
-    label: "AI Assistant",
+    label: "AIアシスタント",
   },
   {
     href: "/tasks",
-    icon: CheckSquare,
-    label: "Tasks",
+    icon: ListChecks,
+    label: "タスク",
   },
-  { href: "/daily", icon: Clock, label: "Daily Plan" },
-  { href: "/scraps", icon: TowelRack, label: "Scraps" },
-  { href: "/trends", icon: TrendingUp, label: "Trend" },
+  { href: "/daily", icon: Clock, label: "行動プラン" },
+  { href: "/scraps", icon: TowelRack, label: "スクラップ" },
+  { href: "/trends", icon: TrendingUp, label: "トレンド" },
 ];
 
 const SERVICE_NAV: NavItem[] = [
@@ -76,9 +77,9 @@ const SERVICE_NAV: NavItem[] = [
   },
 ];
 
-const SYSTEM_NAV: NavItem[] = [
-  { href: "/settings", icon: Settings, label: "Settings" },
-];
+// const SYSTEM_NAV: NavItem[] = [
+//   { href: "/settings", icon: Settings, label: "Settings" },
+// ];
 
 // ===========================================================
 // Components
@@ -112,14 +113,14 @@ export default function Sidebar({ user }: { user: SidebarUser | null }) {
             />
           </Link>
           <Link href="/chat" className="brand-name">
-            Lumo
+            Luno
           </Link>
         </div>
 
         <div className="sidebar-scroll">
           {/* ── Main Nav ── */}
           <NavSection
-            label="Menu"
+            label="メニュー"
             items={MAIN_NAV}
             isActive={isActive}
             expanded={expanded}
@@ -128,17 +129,8 @@ export default function Sidebar({ user }: { user: SidebarUser | null }) {
 
           {/* ── Service Nav ── */}
           <NavSection
-            label="Other Service"
+            label="外部サービス"
             items={SERVICE_NAV}
-            isActive={isActive}
-            expanded={expanded}
-            onToggle={toggleExpand}
-          />
-
-          {/* ── System Nav ── */}
-          <NavSection
-            label="System"
-            items={SYSTEM_NAV}
             isActive={isActive}
             expanded={expanded}
             onToggle={toggleExpand}
