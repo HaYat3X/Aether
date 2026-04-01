@@ -12,8 +12,8 @@
 
 .notif-bell-btn {
   position: relative;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 10px;
   border: 1px solid var(--color-border);
   background: transparent;
@@ -43,7 +43,7 @@
 .notif-badge {
   position: absolute;
   top: -5px;
-  right: -5px;
+  right: -6px;
   min-width: 16px;
   height: 16px;
   border-radius: 8px;
@@ -56,6 +56,7 @@
   align-items: center;
   justify-content: center;
   padding: 0 3px;
+  padding-top: 2px;
   border: 1.5px solid var(--color-bg-base);
   line-height: 1;
 }
@@ -80,11 +81,11 @@
 /* ── Panel ── */
 
 .notif-panel {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
+  position: fixed;
+  top: 64px;
+  right: 24px;
   width: 360px;
-  max-height: 460px;
+  max-height: 560px;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
   border-radius: 16px;
@@ -483,7 +484,7 @@
   color: var(--color-text-muted);
   line-height: 1.6;
   margin: 0;
-  max-width: 240px;
+  max-width: 220px;
 }
 
 /* ── Footer ── */
@@ -543,4 +544,64 @@
       transform: translateY(0);
     }
   }
+}
+
+/* ── Loading ── */
+
+.notif-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 48px 24px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+@keyframes notifSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.notif-spinner {
+  animation: notifSpin 1s linear infinite;
+  color: var(--color-accent);
+}
+
+/* ── Error ── */
+
+.notif-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 18px;
+  margin: 8px 12px;
+  border-radius: 10px;
+  background: rgba(184, 48, 48, 0.05);
+  border: 1px solid rgba(184, 48, 48, 0.12);
+  color: var(--color-red);
+  font-size: 12px;
+}
+
+.notif-retry-btn {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(184, 48, 48, 0.2);
+  background: transparent;
+  color: var(--color-red);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.notif-retry-btn:hover {
+  background: rgba(184, 48, 48, 0.08);
 }

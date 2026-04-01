@@ -45,6 +45,8 @@ NOTION_REVIEW_DS_ID=
 NOTION_OKR_DS_ID=
 # KRデータソース
 NOTION_KR_DS_ID=
+# 通知のDS
+NOTION_NOTIFICATION_DS_ID=
 
 # ============================================
 # Google Cloud サービスアカウント

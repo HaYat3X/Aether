@@ -12,6 +12,8 @@ import {
   AlarmClock,
   Sparkles,
   ChevronRight,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import "./NotificationPanel.css";
 
@@ -19,10 +21,10 @@ import "./NotificationPanel.css";
    Types
    ────────────────────────────────────────── */
 export type NotificationType =
-  | "schedule" // 週始めサマリ
-  | "reminder" // 期限切れ・今日期限
-  | "daily_plan" // デイリープラン未作成
-  | "action"; // AI操作完了（将来拡張）
+  | "schedule"
+  | "reminder"
+  | "daily_plan"
+  | "action";
 
 export type Notification = {
   id: string;
@@ -30,70 +32,18 @@ export type Notification = {
   title: string;
   body: string;
   isRead: boolean;
-  createdAt: string; // ISO 8601
-  link?: string; // クリックで遷移するURL（任意）
+  createdAt: string;
+  link?: string | null;
 };
-
-/* ──────────────────────────────────────────
-   Mock data（後でNotion APIに差し替え）
-   ────────────────────────────────────────── */
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: "n1",
-    type: "reminder",
-    title: "期限切れのタスクがあります",
-    body: "「APIリファクタリング」など2件のタスクが期限を過ぎています。",
-    isRead: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30分前
-    link: "/tasks",
-  },
-  {
-    id: "n2",
-    type: "daily_plan",
-    title: "今日のデイリープランが未作成です",
-    body: "Lumoに「デイリープランを作って」と話しかけると、自動で今日の予定を組み立てます。",
-    isRead: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2時間前
-    link: "/chat",
-  },
-  {
-    id: "n3",
-    type: "schedule",
-    title: "今週のサマリ",
-    body: "今週は5件のタスクが完了しました。進行中3件、未着手4件。来週に向けて振り返りをしましょう。",
-    isRead: false,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1日前
-    link: "/tasks",
-  },
-  {
-    id: "n4",
-    type: "reminder",
-    title: "今日期限のタスクがあります",
-    body: "「デザインレビュー」が今日期限です。",
-    isRead: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(), // 26時間前
-    link: "/tasks",
-  },
-  {
-    id: "n5",
-    type: "schedule",
-    title: "今週のキックオフ",
-    body: "今週のタスクは8件、予定は6件です。優先度Highestのタスクが1件あります。",
-    isRead: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(), // 2日前
-  },
-];
 
 /* ──────────────────────────────────────────
    Helpers
    ────────────────────────────────────────── */
 function formatRelativeTime(isoStr: string): string {
-  const now = Date.now();
-  const diff = now - new Date(isoStr).getTime();
+  const diff = Date.now() - new Date(isoStr).getTime();
   const mins = Math.floor(diff / 60000);
   const hours = Math.floor(diff / 3600000);
   const days = Math.floor(diff / 86400000);
-
   if (mins < 1) return "今";
   if (mins < 60) return `${mins}分前`;
   if (hours < 24) return `${hours}時間前`;
@@ -104,29 +54,55 @@ function formatRelativeTime(isoStr: string): string {
 
 const TYPE_CONFIG: Record<
   NotificationType,
-  { icon: React.ElementType; colorClass: string; label: string }
+  { icon: React.ElementType; colorClass: string }
 > = {
-  schedule: {
-    icon: CalendarCheck,
-    colorClass: "notif-type-schedule",
-    label: "スケジュール",
-  },
-  reminder: {
-    icon: AlarmClock,
-    colorClass: "notif-type-reminder",
-    label: "リマインダー",
-  },
-  daily_plan: {
-    icon: Clock,
-    colorClass: "notif-type-daily",
-    label: "デイリープラン",
-  },
-  action: {
-    icon: Sparkles,
-    colorClass: "notif-type-action",
-    label: "アクション完了",
-  },
+  schedule: { icon: CalendarCheck, colorClass: "notif-type-schedule" },
+  reminder: { icon: AlarmClock, colorClass: "notif-type-reminder" },
+  daily_plan: { icon: Clock, colorClass: "notif-type-daily" },
+  action: { icon: Sparkles, colorClass: "notif-type-action" },
 };
+
+/* ──────────────────────────────────────────
+   API functions
+   ────────────────────────────────────────── */
+async function fetchNotifications(): Promise<Notification[]> {
+  const res = await fetch("/api/notifications", { cache: "no-store" });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  return data.notifications ?? [];
+}
+
+async function markAsRead(id: string): Promise<void> {
+  await fetch("/api/notifications/read", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  });
+}
+
+async function markAllAsRead(): Promise<void> {
+  await fetch("/api/notifications/read", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ all: true }),
+  });
+}
+
+async function deleteNotif(id: string): Promise<void> {
+  await fetch("/api/notifications/delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id }),
+  });
+}
+
+async function deleteAllReadNotifs(): Promise<void> {
+  await fetch("/api/notifications/delete", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ readAll: true }),
+  });
+}
 
 /* ──────────────────────────────────────────
    Notification Item
@@ -140,14 +116,12 @@ function NotificationItem({
   onRead: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
-  const cfg = TYPE_CONFIG[notif.type];
+  const cfg = TYPE_CONFIG[notif.type] ?? TYPE_CONFIG.schedule;
   const Icon = cfg.icon;
 
   const handleClick = () => {
     if (!notif.isRead) onRead(notif.id);
-    if (notif.link) {
-      window.location.href = notif.link;
-    }
+    if (notif.link) window.location.href = notif.link;
   };
 
   return (
@@ -155,15 +129,12 @@ function NotificationItem({
       className={`notif-item${notif.isRead ? " is-read" : " is-unread"}${notif.link ? " has-link" : ""}`}
       onClick={handleClick}
     >
-      {/* 未読インジケーター */}
       {!notif.isRead && <div className="notif-unread-dot" />}
 
-      {/* アイコン */}
       <div className={`notif-icon ${cfg.colorClass}`}>
         <Icon size={14} />
       </div>
 
-      {/* コンテンツ */}
       <div className="notif-content">
         <div className="notif-header-row">
           <span className="notif-title">{notif.title}</span>
@@ -179,7 +150,6 @@ function NotificationItem({
         )}
       </div>
 
-      {/* アクション（ホバーで表示） */}
       <div className="notif-actions" onClick={(e) => e.stopPropagation()}>
         {!notif.isRead && (
           <button
@@ -209,68 +179,137 @@ function NotificationItem({
 }
 
 /* ──────────────────────────────────────────
-   Bell Button（PageHeaderに埋め込む用）
+   Bell Button
    ────────────────────────────────────────── */
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] =
-    useState<Notification[]>(MOCK_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
   const panelRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
+  // ── 通知取得 ──
+  const loadNotifications = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchNotifications();
+      setNotifications(data);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 初回マウント時に取得
+  useEffect(() => {
+    loadNotifications();
+  }, [loadNotifications]);
+
+  // パネルを開いたときに再取得
+  useEffect(() => {
+    if (isOpen) loadNotifications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  // 30秒ごとにバックグラウンドポーリング（バッジ更新用）
+  useEffect(() => {
+    if (isOpen) return;
+    const timer = setInterval(async () => {
+      try {
+        const data = await fetchNotifications();
+        setNotifications(data);
+      } catch {
+        /* silent */
+      }
+    }, 30_000);
+    return () => clearInterval(timer);
+  }, [isOpen]);
+
   // パネル外クリックで閉じる
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handle = (e: MouseEvent) => {
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    if (isOpen) document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
   }, [isOpen]);
 
-  // Escキーで閉じる
+  // Escキー
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handle = (e: KeyboardEvent) => {
       if (e.key === "Escape") setIsOpen(false);
     };
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handle);
+    return () => document.removeEventListener("keydown", handle);
   }, []);
 
-  const handleRead = useCallback((id: string) => {
+  // ── 楽観的更新 + API ──
+  const handleRead = useCallback(async (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
     );
+    try {
+      await markAsRead(id);
+    } catch {
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: false } : n)),
+      );
+    }
   }, []);
 
-  const handleDelete = useCallback((id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
+  const handleDelete = useCallback(async (id: string) => {
+    setNotifications((prev) => {
+      const target = prev.find((n) => n.id === id);
+      const next = prev.filter((n) => n.id !== id);
+      deleteNotif(id).catch(() => {
+        if (target) setNotifications((p) => [target, ...p]);
+      });
+      return next;
+    });
   }, []);
 
-  const handleReadAll = useCallback(() => {
+  const handleReadAll = useCallback(async () => {
+    const snapshot = notifications;
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-  }, []);
+    try {
+      await markAllAsRead();
+    } catch {
+      setNotifications(snapshot);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notifications]);
 
-  const handleDeleteAll = useCallback(() => {
+  const handleDeleteAllRead = useCallback(async () => {
+    const snapshot = notifications;
     setNotifications((prev) => prev.filter((n) => !n.isRead));
-  }, []);
+    try {
+      await deleteAllReadNotifs();
+    } catch {
+      setNotifications(snapshot);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notifications]);
 
   const displayed =
     activeTab === "unread"
       ? notifications.filter((n) => !n.isRead)
       : notifications;
 
+  const hasRead = notifications.some((n) => n.isRead);
+
   return (
     <div className="notif-bell-wrapper" ref={panelRef}>
       {/* ── Bell Button ── */}
       <button
         className={`notif-bell-btn${isOpen ? " is-active" : ""}`}
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => setIsOpen((p) => !p)}
         title="通知"
         aria-label={`通知 ${unreadCount}件未読`}
       >
@@ -285,11 +324,10 @@ export function NotificationBell() {
       {/* ── Panel ── */}
       {isOpen && (
         <>
-          {/* Backdrop (モバイル用) */}
           <div className="notif-backdrop" onClick={() => setIsOpen(false)} />
 
           <div className="notif-panel animate-notif-in">
-            {/* Panel Header */}
+            {/* Header */}
             <div className="notif-panel-header">
               <div className="notif-panel-title-row">
                 <h2 className="notif-panel-title">通知</h2>
@@ -299,11 +337,7 @@ export function NotificationBell() {
               </div>
               <div className="notif-panel-header-actions">
                 {unreadCount > 0 && (
-                  <button
-                    className="notif-header-btn"
-                    onClick={handleReadAll}
-                    title="すべて既読"
-                  >
+                  <button className="notif-header-btn" onClick={handleReadAll}>
                     <CheckCheck size={13} />
                     すべて既読
                   </button>
@@ -311,7 +345,6 @@ export function NotificationBell() {
                 <button
                   className="notif-close-btn"
                   onClick={() => setIsOpen(false)}
-                  title="閉じる"
                 >
                   <X size={16} />
                 </button>
@@ -342,7 +375,23 @@ export function NotificationBell() {
 
             {/* List */}
             <div className="notif-list">
-              {displayed.length === 0 ? (
+              {loading ? (
+                <div className="notif-loading">
+                  <Loader2 size={20} className="notif-spinner" />
+                  <span>通知を取得中...</span>
+                </div>
+              ) : error ? (
+                <div className="notif-error">
+                  <AlertCircle size={16} />
+                  <span>取得に失敗しました</span>
+                  <button
+                    className="notif-retry-btn"
+                    onClick={loadNotifications}
+                  >
+                    再試行
+                  </button>
+                </div>
+              ) : displayed.length === 0 ? (
                 <div className="notif-empty">
                   <div className="notif-empty-icon">
                     <Bell size={22} />
@@ -368,10 +417,13 @@ export function NotificationBell() {
               )}
             </div>
 
-            {/* Panel Footer */}
-            {notifications.filter((n) => n.isRead).length > 0 && (
+            {/* Footer */}
+            {hasRead && !loading && (
               <div className="notif-panel-footer">
-                <button className="notif-footer-btn" onClick={handleDeleteAll}>
+                <button
+                  className="notif-footer-btn"
+                  onClick={handleDeleteAllRead}
+                >
                   <Trash2 size={12} />
                   既読をすべて削除
                 </button>
