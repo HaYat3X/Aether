@@ -49,6 +49,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-right: 5px;
 }
  
 .page-header-date {
@@ -57,44 +58,4 @@
   font-weight: 500;
   color: var(--color-text-muted);
   letter-spacing: 0.02em;
-}
-
-/* ── Bell Button ── */
-
-.page-header-bell {
-  position: relative;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--color-border);
-  background: transparent;
-  color: var(--color-text-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.18s ease;
-  flex-shrink: 0;
-}
- 
-.page-header-bell:hover {
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--color-text-secondary);
-  border-color: var(--color-border-hover);
-}
-
-[data-theme="light"] .page-header-bell:hover {
-  background: rgba(0, 0, 0, 0.04);
-}
- 
-.bell-dot {
-  position: absolute;
-  top: 7px;
-  right: 8px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  box-shadow: 0 0 6px var(--color-accent-glow-sm);
-  /* ライトモード対応: アクセントカラーはグローバルで定義済み */
 }
