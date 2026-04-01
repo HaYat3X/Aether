@@ -7,7 +7,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { signOut } from "next-auth/react"; // ← クライアント用に変更
+import { signOut } from "next-auth/react";
 import {
   CheckSquare,
   Clock,
@@ -21,6 +21,10 @@ import {
   CalendarCheck,
   LogOut,
   TrendingUp,
+  ChevronsLeft,
+  ChevronsRight,
+  ListChecks,
+  TowelRack
 } from "lucide-react";
 import { NavSection } from "../ui/NavSection/NavSection";
 import type { NavItem, SidebarUser } from "@/app/types/Sidebar";
@@ -33,16 +37,16 @@ const MAIN_NAV: NavItem[] = [
   {
     href: "/chat",
     icon: Bot,
-    label: "AI Assistant",
+    label: "AIアシスタント",
   },
   {
     href: "/tasks",
-    icon: CheckSquare,
-    label: "Tasks",
+    icon: ListChecks,
+    label: "タスク",
   },
-  { href: "/daily", icon: Clock, label: "Daily Plan" },
-  { href: "/scraps", icon: BookOpen, label: "Scraps" },
-  { href: "/trends", icon: TrendingUp, label: "Trend" },
+  { href: "/daily", icon: Clock, label: "行動プラン" },
+  { href: "/scraps", icon: TowelRack, label: "スクラップ" },
+  { href: "/trends", icon: TrendingUp, label: "トレンド" },
 ];
 
 const SERVICE_NAV: NavItem[] = [
@@ -73,9 +77,9 @@ const SERVICE_NAV: NavItem[] = [
   },
 ];
 
-const SYSTEM_NAV: NavItem[] = [
-  { href: "/settings", icon: Settings, label: "Settings" },
-];
+// const SYSTEM_NAV: NavItem[] = [
+//   { href: "/settings", icon: Settings, label: "Settings" },
+// ];
 
 // ===========================================================
 // Components
@@ -83,6 +87,7 @@ const SYSTEM_NAV: NavItem[] = [
 export default function Sidebar({ user }: { user: SidebarUser | null }) {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const isActive = (href: string) =>
     pathname === href || pathname?.startsWith(href + "/");
@@ -90,81 +95,89 @@ export default function Sidebar({ user }: { user: SidebarUser | null }) {
   const toggleExpand = (href: string) =>
     setExpanded((prev) => (prev === href ? null : href));
 
+  const toggleSidebar = () => setIsCollapsed((prev) => !prev);
+
   return (
-    <aside className="sidebar">
-      {/* ── Brand ── */}
-      <div className="sidebar-brand">
-        <Link href="/chat" className="brand-icon">
-          <Image
-            src="/login.png"
-            alt="Lumo"
-            width={36}
-            height={36}
-            className="rounded-[10px]"
-          />
-        </Link>
-        <Link href="/chat" className="brand-name">
-          Lumo
-        </Link>
-      </div>
-
-      <div className="sidebar-scroll">
-        {/* ── Main Nav ── */}
-        <NavSection
-          label="Menu"
-          items={MAIN_NAV}
-          isActive={isActive}
-          expanded={expanded}
-          onToggle={toggleExpand}
-        />
-
-        {/* ── Service Nav ── */}
-        <NavSection
-          label="Other Service"
-          items={SERVICE_NAV}
-          isActive={isActive}
-          expanded={expanded}
-          onToggle={toggleExpand}
-        />
-
-        {/* ── System Nav ── */}
-        <NavSection
-          label="System"
-          items={SYSTEM_NAV}
-          isActive={isActive}
-          expanded={expanded}
-          onToggle={toggleExpand}
-        />
-      </div>
-
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* ── Divider ── */}
-      <div className="sidebar-divider" />
-
-      <div className="sidebar-user">
-        {user?.image ? (
-          <img
-            src={user.image}
-            alt={user.name ?? ""}
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: "50%",
-              objectFit: "cover",
-              flexShrink: 0,
-            }}
-          />
-        ) : (
-          <div className="user-avatar">{user?.name?.[0] ?? "?"}</div>
-        )}
-        <div className="user-info">
-          <div className="user-name">{user?.name ?? "Unknown"}</div>
-          <div className="user-email">{user?.email ?? ""}</div>
+    <>
+      {/* ── Sidebar ── */}
+      <aside className={`sidebar ${isCollapsed ? "sidebar-collapsed" : ""}`}>
+        {/* ── Brand ── */}
+        <div className="sidebar-brand">
+          <Link href="/chat" className="brand-icon">
+            <Image
+              src="/login.png"
+              alt="Lumo"
+              width={36}
+              height={36}
+              className="rounded-[10px]"
+            />
+          </Link>
+          <Link href="/chat" className="brand-name">
+            Luno
+          </Link>
         </div>
-        <LogOut size={16} onClick={() => signOut({ callbackUrl: "/login" })} />
-      </div>
-    </aside>
+
+        <div className="sidebar-scroll">
+          {/* ── Main Nav ── */}
+          <NavSection
+            label="メニュー"
+            items={MAIN_NAV}
+            isActive={isActive}
+            expanded={expanded}
+            onToggle={toggleExpand}
+          />
+
+          {/* ── Service Nav ── */}
+          <NavSection
+            label="外部サービス"
+            items={SERVICE_NAV}
+            isActive={isActive}
+            expanded={expanded}
+            onToggle={toggleExpand}
+          />
+        </div>
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* ── Divider ── */}
+        <div className="sidebar-divider" />
+
+        <div className="sidebar-user">
+          <button
+            className="user-avatar-btn"
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            title="ログアウト"
+          >
+            {user?.image ? (
+              <img
+                src={user.image}
+                alt={user.name ?? ""}
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  flexShrink: 0,
+                }}
+              />
+            ) : (
+              <div className="user-avatar">{user?.name?.[0] ?? "?"}</div>
+            )}
+          </button>
+          <div className="user-info">
+            <div className="user-name">{user?.name ?? "Unknown"}</div>
+            <div className="user-email">{user?.email?.split("@")[0] ?? ""}</div>
+          </div>
+          <button
+            className="user-logout-btn"
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            title="ログアウト"
+          >
+            <LogOut size={16} />
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }

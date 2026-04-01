@@ -9,6 +9,12 @@
   background: var(--color-bg-sidebar);
   border-right: 1px solid var(--color-border);
   overflow: hidden;
+  transition: transform 0.3s ease;
+  z-index: 100;
+}
+
+.sidebar.sidebar-collapsed {
+  transform: translateX(calc(-1 * var(--sidebar-width)));
 }
 
 .sidebar-scroll {
@@ -80,12 +86,48 @@
   gap: 10px;
   padding: 16px 18px 20px;
   flex-shrink: 0;
-  cursor: pointer;
   transition: background 0.15s ease;
 }
 
 .sidebar-user:hover {
   background: rgba(255, 255, 255, 0.03);
+}
+
+.user-avatar-btn {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.user-avatar-btn:hover {
+  transform: scale(1.05);
+}
+
+.user-logout-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color 0.15s ease,
+    transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.user-logout-btn:hover {
+  color: var(--color-text-primary);
+  transform: scale(1.1);
 }
 
 .user-avatar {
@@ -107,7 +149,7 @@
   transition: box-shadow 0.2s ease;
 }
 
-.sidebar-user:hover .user-avatar {
+.user-avatar-btn:hover .user-avatar {
   box-shadow:
     0 0 0 2px var(--color-bg-base),
     0 0 0 4px rgba(59, 130, 246, 0.3);
@@ -140,4 +182,33 @@
   background: var(--color-green);
   box-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
   flex-shrink: 0;
+}
+
+/* ── Toggle Button ── */
+.sidebar-toggle {
+  position: fixed;
+  left: 220px;
+  top: 10px;
+  width: 25px;
+  height: 25px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-sidebar);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    left 0.3s ease;
+  z-index: 101;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

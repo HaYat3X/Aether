@@ -46,7 +46,7 @@
   --color-border-accent: rgba(59, 130, 246, 0.15);
 
   /* Sidebar */
-  --sidebar-width: 260px;
+  --sidebar-width: 225px;
 }
 
 /* ============================================
@@ -107,16 +107,22 @@
   --color-border-accent: rgba(204, 85, 34, 0.25);
 }
 
+@keyframes pulseGlowLight {
+
+  0%,
+  100% {
+    box-shadow: 0 0 6px rgba(204, 85, 34, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 14px rgba(204, 85, 34, 0.4);
+  }
+}
+
 /* ============================================
    Base Styles
    ============================================ */
-
-html,
-html[data-theme="dark"] {
-  color-scheme: dark;
-}
-
-html[data-theme="light"] {
+html {
   color-scheme: light;
 }
 
@@ -126,6 +132,332 @@ body {
   font-family: var(--font-body), "Noto Sans JP", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   SIDEBAR
+   ============================================ */
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: var(--sidebar-width);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-sidebar);
+  border-right: 1px solid var(--color-border);
+  z-index: 100;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 0;
+}
+
+/* ── Brand ── */
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 20px 20px;
+  flex-shrink: 0;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg,
+      var(--color-accent) 0%,
+      var(--color-accent-dim) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow:
+    0 2px 16px var(--color-accent-glow-sm),
+    0 0 0 1px rgba(59, 130, 246, 0.15);
+  flex-shrink: 0;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.3s ease;
+}
+
+.brand-icon:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 4px 24px var(--color-accent-glow),
+    0 0 0 1px rgba(59, 130, 246, 0.25);
+}
+
+.brand-name {
+  font-family: var(--font-heading), "Outfit", sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+/* ── Nav Section ── */
+
+.nav-section {
+  padding: 8px 10px;
+  flex-shrink: 0;
+}
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  padding: 12px 10px 6px;
+  user-select: none;
+}
+
+/* ── Nav Item ── */
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px;
+  width: 100%;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  position: relative;
+  user-select: none;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-text-primary);
+}
+
+.nav-item svg {
+  flex-shrink: 0;
+  opacity: 0.55;
+  transition: opacity 0.18s ease;
+}
+
+.nav-item:hover svg {
+  opacity: 0.8;
+}
+
+.nav-label {
+  flex: 1;
+  text-align: left;
+}
+
+.nav-badge {
+  font-family: var(--font-mono), "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--color-accent-bright);
+  line-height: 1.4;
+}
+
+.nav-chevron {
+  color: var(--color-text-dim);
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.nav-chevron svg {
+  opacity: 0.4;
+}
+
+/* Active state */
+
+.nav-item.active {
+  background: var(--color-accent-glow-subtle);
+  color: var(--color-text-primary);
+}
+
+.nav-item.active>svg {
+  opacity: 1;
+  color: var(--color-accent-bright);
+}
+
+.nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 18px;
+  border-radius: 0 4px 4px 0;
+  background: var(--color-accent);
+  box-shadow:
+    0 0 10px var(--color-accent-glow-sm),
+    3px 0 6px var(--color-accent-glow-subtle);
+}
+
+.nav-item.active::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  box-shadow: inset 0 0 12px var(--color-accent-glow-subtle);
+  pointer-events: none;
+}
+
+/* Expanded parent chevron rotation */
+.nav-parent.expanded .nav-chevron {
+  transform: rotate(90deg);
+}
+
+/* ── Sub-menu ── */
+
+.nav-sub {
+  padding-left: 18px;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+}
+
+.nav-sub.open {
+  max-height: 200px;
+}
+
+.nav-sub .nav-item {
+  height: 36px;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  padding-left: 30px;
+  gap: 8px;
+}
+
+.nav-sub .nav-item::before {
+  display: none;
+}
+
+.nav-sub .nav-item::after {
+  display: none;
+}
+
+.nav-sub .nav-item:hover {
+  color: var(--color-text-secondary);
+}
+
+.nav-sub .nav-item.active {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.sub-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-text-dim);
+  flex-shrink: 0;
+  transition: all 0.18s ease;
+}
+
+.nav-sub .nav-item:hover .sub-dot {
+  background: var(--color-text-muted);
+}
+
+.nav-sub .nav-item.active .sub-dot {
+  background: var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent-glow-sm);
+}
+
+/* ── Divider ── */
+
+.sidebar-divider {
+  height: 1px;
+  margin: 4px 20px;
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+
+/* ── User ── */
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px 20px;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sidebar-user:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg,
+      var(--color-accent-dim),
+      var(--color-purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+  transition: box-shadow 0.2s ease;
+}
+
+.sidebar-user:hover .user-avatar {
+  box-shadow:
+    0 0 0 2px var(--color-bg-base),
+    0 0 0 4px rgba(59, 130, 246, 0.3);
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 1px;
+}
+
+.user-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-green);
+  box-shadow: 0 0 6px rgba(52, 211, 153, 0.4);
+  flex-shrink: 0;
 }
 
 /* ============================================
@@ -196,27 +528,27 @@ body {
   animation: fadeUp 0.45s ease-out both;
 }
 
-.stagger > *:nth-child(1) {
+.stagger>*:nth-child(1) {
   animation-delay: 0ms;
 }
 
-.stagger > *:nth-child(2) {
+.stagger>*:nth-child(2) {
   animation-delay: 50ms;
 }
 
-.stagger > *:nth-child(3) {
+.stagger>*:nth-child(3) {
   animation-delay: 100ms;
 }
 
-.stagger > *:nth-child(4) {
+.stagger>*:nth-child(4) {
   animation-delay: 150ms;
 }
 
-.stagger > *:nth-child(5) {
+.stagger>*:nth-child(5) {
   animation-delay: 200ms;
 }
 
-.stagger > *:nth-child(6) {
+.stagger>*:nth-child(6) {
   animation-delay: 250ms;
 }
 
@@ -225,6 +557,7 @@ body {
    ============================================ */
 
 @keyframes typingDot {
+
   0%,
   60%,
   100% {
@@ -257,3 +590,12 @@ body {
 [data-theme="light"] .typing-dot {
   background: var(--color-text-muted);
 }
+
+/* ====================================================== */
+/* Dashboard Sidebar State Management */
+/* ====================================================== */
+
+/* CSS兄弟セレクタを使用してサイドバー状態に応じてmainを調整 */
+/* .sidebar.sidebar-collapsed ~ .dashboard-main {
+  margin-left: 0 !important;
+} */
