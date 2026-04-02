@@ -1,6 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
-import { executeTool } from "./notion";
 import { SYSTEM_PROMPTS, SKILLS, executeSkill } from "@/skills";
 
 /* ──────────────────────────────────────────
@@ -36,6 +35,47 @@ const SYSTEM_PROMPT = `あなたは「Luno」という名前のAI秘書です。
 ## スキル定義
 ${SYSTEM_PROMPTS}
 `;
+
+/* ──────────────────────────────────────────
+   プロンプト
+   ────────────────────────────────────────── */
+// 定数をやめて関数にする
+function buildSystemPrompt(): string {
+  const today = new Date()
+    .toLocaleDateString("ja-JP", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      timeZone: "Asia/Tokyo",
+    })
+    .replace(/\//g, "-");
+
+  return `あなたは「Luno」という名前のAI秘書です。
+ユーザーの個人的なスケジュール管理・タスク管理・メモ作成をサポートしつつ、
+知的な相談相手としてもユーザーを支援します。
+今日の日付は ${today} です。
+
+## 性格・口調
+- 丁寧だけど堅すぎない、頼れる秘書のような口調
+- 簡潔に要点をまとめて回答する
+- 日本語で応答する
+- 質問や相談には、自分の知識と思考力をフルに使って回答する
+
+## 回答方針（重要）
+あなたはAIとして豊富な知識と思考力を持っています。ツールに頼るのは「ユーザーの実データが必要なとき」だけです。
+
+### ツールを使わず、自分の知識で回答するケース
+- 「○○について調べて」「○○って何？」→ AI自身の知識で回答
+- 「どうしたらいいと思う？」「アドバイスください」→ 自分の考えで提案
+- 「○○のやり方教えて」→ 手順・方法を説明
+- プログラミング、技術、ビジネス、一般知識の質問 → AI知識で回答
+- 壁打ち、ブレスト、アイデア出し → 創造的に一緒に考える
+- 文章の添削、要約、翻訳 → AIの得意分野として対応
+
+## スキル定義
+${SYSTEM_PROMPTS}
+`;
+}
 
 /* ──────────────────────────────────────────
    Types
@@ -114,12 +154,10 @@ export async function POST(req: NextRequest) {
         let response = await client.messages.create({
           model: MODEL,
           max_tokens: 1024,
-          system: SYSTEM_PROMPT,
+          system: buildSystemPrompt(),
           tools: SKILLS,
           messages: apiMessages,
         });
-
-        console.log(SYSTEM_PROMPT);
 
         // ── Step 2: Tool use loop ──
         // Claude may request tool use multiple rounds.
@@ -160,20 +198,23 @@ export async function POST(req: NextRequest) {
             sse.sendStatus(`${toolUse.name} を実行中...`);
 
             // マージしたツールを使う
-            const result =
-              (await executeSkill(
-                toolUse.name,
-                toolUse.input as Record<string, unknown>,
-              )) ??
-              (await executeTool(
-                toolUse.name,
-                toolUse.input as Record<string, unknown>,
-              ));
+            const result = await executeSkill(
+              toolUse.name,
+              toolUse.input as Record<string, unknown>,
+            );
 
             toolResults.push({
               type: "tool_result",
               tool_use_id: toolUse.id,
-              content: result,
+              content: [
+                {
+                  type: "text",
+                  text:
+                    typeof result === "string"
+                      ? result
+                      : JSON.stringify(result),
+                },
+              ],
             });
           }
 
@@ -187,7 +228,7 @@ export async function POST(req: NextRequest) {
           response = await client.messages.create({
             model: MODEL,
             max_tokens: 2048,
-            system: SYSTEM_PROMPT,
+            system: buildSystemPrompt(),
             tools: SKILLS,
             messages: conversationMessages,
           });
