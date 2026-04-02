@@ -16,12 +16,24 @@ import { queryNotionDatabase } from "./query-notion-database/script";
 import { createDailyPlanSkill } from "./create-daily-plan";
 import { createDailyPlan } from "./create-daily-plan/script";
 
+import { scrapRegisterSkill } from "./scrap-register";
+import { scrapRegister } from "./scrap-register/script";
+
+import { scrapUrlSkill } from "./scrap-url";
+import { scrapUrl } from "./scrap-url/script";
+
+import { scrapTextSkill } from "./scrap-text";
+import { scrapText } from "./scrap-text/script";
+
 import type Anthropic from "@anthropic-ai/sdk";
 import type { CreateTaskInput } from "./create-task/script";
 import type { CreateEventInput } from "./create-event/script";
 import type { QueryInput } from "./query-notion-database/script";
 import type { CreateDailyPlanInput } from "./create-daily-plan/script";
 import type { GetEventsInput } from "./get-events/script";
+import type { ScrapRegisterInput } from "./scrap-register/script";
+import type { ScrapTextInput } from "./scrap-text/script";
+import type { ScrapUrlInput } from "./scrap-url/script";
 
 /* ──────────────────────────────────────────
    SKILLSリスト
@@ -32,6 +44,8 @@ export const SKILLS: Anthropic.Tool[] = [
   createEventSkill.tool,
   queryNotionDatabaseSkill.tool,
   createDailyPlanSkill.tool,
+  scrapUrlSkill.tool,
+  scrapTextSkill.tool,
 ];
 
 /* ──────────────────────────────────────────
@@ -43,6 +57,8 @@ export const SYSTEM_PROMPTS = [
   createEventSkill,
   queryNotionDatabaseSkill,
   createDailyPlanSkill,
+  scrapUrlSkill,
+  scrapTextSkill,
 ]
   .map((s) => s.systemPrompt)
   .filter(Boolean)
@@ -77,6 +93,18 @@ export async function executeSkill(
     }
     case "create-daily-plan": {
       const result = await createDailyPlan(toolInput as CreateDailyPlanInput);
+      return JSON.stringify(result);
+    }
+    case "scrap-register": {
+      const result = await scrapRegister(toolInput as ScrapRegisterInput);
+      return JSON.stringify(result);
+    }
+    case "scrap-url": {
+      const result = await scrapUrl(toolInput as ScrapUrlInput);
+      return JSON.stringify(result);
+    }
+    case "scrap-text": {
+      const result = await scrapText(toolInput as ScrapTextInput);
       return JSON.stringify(result);
     }
     default:

@@ -4,28 +4,28 @@
 import fs from "fs";
 import path from "path";
 import type Anthropic from "@anthropic-ai/sdk";
-import { scrapUrlSchema } from "./schema";
+import { scrapTextSchema } from "./schema";
 
 /* ──────────────────────────────────────────
    .mdファイルのコンテンツを取得
    ────────────────────────────────────────── */
 const description = fs.readFileSync(
-  path.join(process.cwd(), "skills/scrap-url/SKILL.md"),
+  path.join(process.cwd(), "skills/scrap-text/SKILL.md"),
   "utf-8",
 );
 const systemPrompt = fs.readFileSync(
-  path.join(process.cwd(), "skills/scrap-url/SYSTEM_PROMPT.md"),
+  path.join(process.cwd(), "skills/scrap-text/SYSTEM_PROMPT.md"),
   "utf-8",
 );
 
 /* ──────────────────────────────────────────
    スキルをエクスポート
    ────────────────────────────────────────── */
-export const scrapUrlSkill = {
+export const scrapTextSkill = {
   tool: {
-    name: "scrap-url",
+    name: "scrap-text",
     description,
-    input_schema: scrapUrlSchema,
+    input_schema: scrapTextSchema,
   } satisfies Anthropic.Tool,
   systemPrompt,
 };
