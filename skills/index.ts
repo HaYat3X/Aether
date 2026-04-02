@@ -27,17 +27,23 @@ import type { GetEventsInput } from "./get-events/script";
    SKILLSリスト
    ────────────────────────────────────────── */
 export const SKILLS: Anthropic.Tool[] = [
-  createTaskSkill,
-  getEventsSkill,
-  createEventSkill,
-  queryNotionDatabaseSkill,
+  createTaskSkill.tool,
+  getEventsSkill.tool,
+  createEventSkill.tool,
+  queryNotionDatabaseSkill.tool,
   createDailyPlanSkill.tool,
 ];
 
 /* ──────────────────────────────────────────
    SYSTEM_PROMPTリスト
    ────────────────────────────────────────── */
-export const SYSTEM_PROMPTS = [createDailyPlanSkill]
+export const SYSTEM_PROMPTS = [
+  createTaskSkill,
+  getEventsSkill,
+  createEventSkill,
+  queryNotionDatabaseSkill,
+  createDailyPlanSkill,
+]
   .map((s) => s.systemPrompt)
   .filter(Boolean)
   .join("\n\n---\n\n");

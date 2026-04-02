@@ -13,12 +13,19 @@ const description = fs.readFileSync(
   path.join(process.cwd(), "skills/query-notion-database/SKILL.md"),
   "utf-8",
 );
+const systemPrompt = fs.readFileSync(
+  path.join(process.cwd(), "skills/query-notion-database/SYSTEM_PROMPT.md"),
+  "utf-8",
+);
 
 /* ──────────────────────────────────────────
    スキルをエクスポート
    ────────────────────────────────────────── */
-export const queryNotionDatabaseSkill: Anthropic.Tool = {
-  name: "query-notion-database",
-  description,
-  input_schema: queryNotionDatabaseSchema,
+export const queryNotionDatabaseSkill = {
+  tool: {
+    name: "query-notion-database",
+    description,
+    input_schema: queryNotionDatabaseSchema,
+  } satisfies Anthropic.Tool,
+  systemPrompt,
 };

@@ -13,12 +13,19 @@ const description = fs.readFileSync(
   path.join(process.cwd(), "skills/get-events/SKILL.md"),
   "utf-8",
 );
+const systemPrompt = fs.readFileSync(
+  path.join(process.cwd(), "skills/get-events/SYSTEM_PROMPT.md"),
+  "utf-8",
+);
 
 /* ──────────────────────────────────────────
    スキルをエクスポート
    ────────────────────────────────────────── */
-export const getEventsSkill: Anthropic.Tool = {
-  name: "get-events",
-  description,
-  input_schema: getEventsSchema,
+export const getEventsSkill = {
+  tool: {
+    name: "get-events",
+    description,
+    input_schema: getEventsSchema,
+  } satisfies Anthropic.Tool,
+  systemPrompt,
 };
