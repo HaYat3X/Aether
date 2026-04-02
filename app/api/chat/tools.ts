@@ -41,60 +41,6 @@ export const TOOLS: Anthropic.Tool[] = [
       required: ["title"],
     },
   },
-  //   {
-  //     name: "get_events",
-  //     description: `Googleカレンダーから予定を取得する。
-  // 「今日の予定は？」「明日の予定を教えて」「今週の予定」などスケジュール確認の意図を示した場合に使用する。
-  // 日付を省略した場合は今日の予定を取得する。`,
-  //     input_schema: {
-  //       type: "object" as const,
-  //       properties: {
-  //         date: {
-  //           type: "string",
-  //           description: "取得したい日付（YYYY-MM-DD形式）。省略時は今日。",
-  //         },
-  //         days: {
-  //           type: "number",
-  //           description: "何日分取得するか。デフォルト1。「今週」なら7。",
-  //         },
-  //       },
-  //       required: [],
-  //     },
-  //   },
-  {
-    name: "create_event",
-    description: `Googleカレンダーに新しい予定を登録する。
-「明日14時に会議を入れて」「予定を追加して」など予定登録の意図を示した場合に使用する。
-タイトル・日付・開始時刻・終了時刻が必須。ユーザーが終了時刻を言わなかった場合は開始時刻の1時間後をデフォルトにする。`,
-    input_schema: {
-      type: "object" as const,
-      properties: {
-        title: {
-          type: "string",
-          description: "予定のタイトル（必須）",
-        },
-        date: {
-          type: "string",
-          description:
-            "日付（YYYY-MM-DD形式、必須）。「明日」「来週月曜」などは適切な日付に変換する。",
-        },
-        start_time: {
-          type: "string",
-          description: "開始時刻（HH:mm形式、必須）",
-        },
-        end_time: {
-          type: "string",
-          description:
-            "終了時刻（HH:mm形式、必須）。ユーザーが指定しない場合は開始の1時間後。",
-        },
-        description: {
-          type: "string",
-          description: "予定の説明（任意）",
-        },
-      },
-      required: ["title", "date", "start_time", "end_time"],
-    },
-  },
   {
     name: "query_notion_database",
     description: `Notionのデータベースからレコードを取得する。

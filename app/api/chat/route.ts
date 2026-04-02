@@ -7,7 +7,7 @@ import { executeTool } from "./notion";
 import { SKILLS, executeSkill } from "@/skills";
 
 // SKILLSと既存TOOLSをマージ
-const ALL_TOOLS = [...SKILLS, ...TOOLS.filter((t) => t.name !== "get-events")];
+const ALL_TOOLS = [...SKILLS];
 
 /* ──────────────────────────────────────────
    Config
@@ -39,7 +39,7 @@ const SYSTEM_PROMPT = `あなたは「Luno」という名前のAI秘書です。
 - 文章の添削、要約、翻訳 → AIの得意分野として対応
 
 ### ツールを使うケース
-- 「今日の予定は？」→ get_events（ユーザーの実データが必要）
+- 「今日の予定は？」→ get-events（ユーザーの実データが必要）
 - 「タスク登録して」→ create_task（書き込み操作）
 - 「今のタスク見せて」→ query_notion_database（ユーザーの実データ参照）
 - 「デイリープラン作って」→ 複数ツール連携（後述）
@@ -67,7 +67,7 @@ const SYSTEM_PROMPT = `あなたは「Luno」という名前のAI秘書です。
 - 「明日の予定」→ get_events（date=明日の日付）
 - 「今週の予定」→ get_events（date=今日, days=7）
 - 予定取得後は見やすく箇条書きで時刻・タイトルを伝える
-- 「予定を入れて」→ create_event を使う
+- 「予定を入れて」→ create-event を使う
 - 「明日」「来週月曜」などの相対日付は、今日の日付から計算してYYYY-MM-DD形式にする
 - ユーザーが終了時刻を言わなかった場合は開始の1時間後をデフォルトにする
 

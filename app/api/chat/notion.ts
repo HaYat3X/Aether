@@ -77,30 +77,12 @@ export async function createTask(input: CreateTaskInput) {
    ────────────────────────────────────────── */
 export async function executeTool(
   toolName: string,
-  toolInput: Record<string, unknown>
+  toolInput: Record<string, unknown>,
 ): Promise<string> {
   try {
     switch (toolName) {
       case "create_task": {
         const result = await createTask(toolInput as CreateTaskInput);
-        return JSON.stringify(result);
-      }
-      case "get-events": {
-        const result = await getEvents(
-          toolInput as { date?: string; days?: number }
-        );
-        return JSON.stringify(result);
-      }
-      case "create_event": {
-        const result = await createEvent(
-          toolInput as {
-            title: string;
-            date: string;
-            start_time: string;
-            end_time: string;
-            description?: string;
-          }
-        );
         return JSON.stringify(result);
       }
       case "query_notion_database": {
@@ -110,13 +92,13 @@ export async function executeTool(
             status_filter?: string;
             sprint_status_filter?: string;
             limit?: number;
-          }
+          },
         );
         return JSON.stringify(result);
       }
       case "search_notion": {
         const result = await searchNotion(
-          toolInput as { query: string; limit?: number }
+          toolInput as { query: string; limit?: number },
         );
         return JSON.stringify(result);
       }
@@ -132,7 +114,7 @@ export async function executeTool(
               related_task_id?: string;
             }>;
             date?: string;
-          }
+          },
         );
         return JSON.stringify(result);
       }
@@ -140,7 +122,8 @@ export async function executeTool(
         return JSON.stringify({ error: `Unknown tool: ${toolName}` });
     }
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Tool execution failed";
+    const message =
+      err instanceof Error ? err.message : "Tool execution failed";
     console.error(`Tool ${toolName} error:`, err);
     return JSON.stringify({ error: message });
   }
