@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import Link from "next/link";
 import "./main.css";
 import {
   Loader2,
@@ -278,7 +279,9 @@ function ArticleCard({
 
         <div className="zenn-card-main">
           <div className="zenn-card-title-row">
-            <span className="zenn-card-title">{article.title}</span>
+            <Link href={`/zenn/${article.slug}`} className="zenn-card-title">
+              {article.title}
+            </Link>
             <div style={{ display: "flex", gap: "5px", flexShrink: 0 }}>
               <span
                 className={`zenn-badge ${article.published
