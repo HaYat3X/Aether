@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Save, Settings, Copy, Check, AlertCircle } from "lucide-react";
+import { Save, Check, AlertCircle, Bot, FileText } from "lucide-react";
 import "./main.css";
 
 /* ──────────────────────────────────────────
@@ -74,22 +74,29 @@ function TabNav({
   active,
   onChange,
 }: {
-  tabs: { id: string; label: string; icon?: React.ReactNode }[];
+  tabs: { id: string; label: string; icon?: React.ElementType }[];
   active: string;
   onChange: (id: string) => void;
 }) {
   return (
     <div className="settings-tabs">
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          className={`settings-tab-btn${active === tab.id ? " active" : ""}`}
-          onClick={() => onChange(tab.id)}
-        >
-          {tab.icon && <span className="tab-icon">{tab.icon}</span>}
-          <span>{tab.label}</span>
-        </button>
-      ))}
+      {tabs.map((tab) => {
+        const Icon = tab.icon;
+        return (
+          <button
+            key={tab.id}
+            className={`settings-tab-btn${active === tab.id ? " active" : ""}`}
+            onClick={() => onChange(tab.id)}
+          >
+            {Icon && (
+              <span className="tab-icon">
+                <Icon size={12} />
+              </span>
+            )}
+            <span>{tab.label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -141,16 +148,12 @@ export default function SettingsPage() {
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        // Try API first
-        const res = await fetch("/api/settings", {
-          cache: "no-store",
-        });
+        const res = await fetch("/api/settings", { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
           setConfig((prev) => ({ ...prev, ...data }));
         }
       } catch {
-        // Fall back to localStorage
         try {
           const stored = localStorage.getItem("lumo_config");
           if (stored) {
@@ -184,14 +187,9 @@ export default function SettingsPage() {
         throw new Error(err.error || `HTTP ${res.status}`);
       }
 
-      // Also save to localStorage for fallback
       localStorage.setItem("lumo_config", JSON.stringify(config));
 
-      setSaveStatus({
-        type: "success",
-        message: "Lumoの設定を保存しました",
-      });
-
+      setSaveStatus({ type: "success", message: "Lumoの設定を保存しました" });
       setTimeout(() => setSaveStatus(null), 3000);
     } catch (err) {
       setSaveStatus({
@@ -250,8 +248,8 @@ export default function SettingsPage() {
   };
 
   const tabs = [
-    { id: "basic", label: "基本設定" },
-    { id: "prompt", label: "プロンプト" },
+    { id: "basic", label: "基本設定", icon: Bot },
+    { id: "prompt", label: "プロンプト", icon: FileText },
   ];
 
   return (
