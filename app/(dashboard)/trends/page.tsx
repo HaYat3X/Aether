@@ -9,36 +9,34 @@ import {
   TrendingUp,
   Cpu,
   Globe,
-  Briefcase,
-  FlaskConical,
   Layers,
   Sparkles,
-  ExternalLink,
+  BookOpen,
+  Map,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────
-type TrendCategory = "AI" | "Tech" | "Business" | "Science" | "World" | "Other";
+type TrendCategory = "AI/LLM" | "Frontend" | "GIS" | "Japanese" | "Other";
 
 type TrendItem = {
   id: string;
   title: string;
   summary: string;
   category: TrendCategory;
-  impactScore: number;
-  keywords: string[];
-  sourceUrl?: string;    // ← 追加
+  publishedAt: string;
+  sourceUrl: string;
+  sourceName: string;
   isFeatured?: boolean;
 };
 
 type TrendResponse = {
   items: TrendItem[];
-  digest: string;
   fetchedAt: string;
 };
 
 // ── Cache ──────────────────────────────────────────────────
-const CACHE_KEY = "aether_trends_cache";
-const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const CACHE_KEY = "lumo_rss_trends_cache";
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1時間（RSSは鮮度が命）
 
 function loadCache(): TrendResponse | null {
   try {
@@ -56,11 +54,17 @@ function loadCache(): TrendResponse | null {
 function saveCache(data: TrendResponse) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
 }
 
 function clearCache() {
-  try { localStorage.removeItem(CACHE_KEY); } catch { /* noop */ }
+  try {
+    localStorage.removeItem(CACHE_KEY);
+  } catch {
+    /* noop */
+  }
 }
 
 // ── Category Config ─────────────────────────────────────────
@@ -69,42 +73,85 @@ type CategoryConfig = {
   cardClass: string;
   badgeClass: string;
   icon: React.ElementType;
+  description: string;
 };
 
 const CATEGORY_CONFIG: Record<TrendCategory, CategoryConfig> = {
-  AI: { label: "AI", cardClass: "cat-ai", badgeClass: "trend-badge-ai", icon: Sparkles },
-  Tech: { label: "Tech", cardClass: "cat-tech", badgeClass: "trend-badge-tech", icon: Cpu },
-  Business: { label: "Business", cardClass: "cat-business", badgeClass: "trend-badge-business", icon: Briefcase },
-  Science: { label: "Science", cardClass: "cat-science", badgeClass: "trend-badge-science", icon: FlaskConical },
-  World: { label: "World", cardClass: "cat-world", badgeClass: "trend-badge-world", icon: Globe },
-  Other: { label: "Other", cardClass: "cat-other", badgeClass: "trend-badge-other", icon: Layers },
+  "AI/LLM": {
+    label: "AI / LLM",
+    cardClass: "cat-ai",
+    badgeClass: "trend-badge-ai",
+    icon: Sparkles,
+    description: "Anthropic・OpenAI 公式ブログ",
+  },
+  Frontend: {
+    label: "Frontend",
+    cardClass: "cat-tech",
+    badgeClass: "trend-badge-tech",
+    icon: Cpu,
+    description: "Vercel・Next.js 公式ブログ",
+  },
+  GIS: {
+    label: "GIS",
+    cardClass: "cat-gis",
+    badgeClass: "trend-badge-gis",
+    icon: Map,
+    description: "ESRIジャパン ブログ",
+  },
+  Japanese: {
+    label: "Japanese",
+    cardClass: "cat-japanese",
+    badgeClass: "trend-badge-japanese",
+    icon: BookOpen,
+    description: "Zenn・Qiita トレンド",
+  },
+  Other: {
+    label: "Other",
+    cardClass: "cat-other",
+    badgeClass: "trend-badge-other",
+    icon: Layers,
+    description: "その他",
+  },
 };
 
-const ALL_CATEGORIES: TrendCategory[] = ["AI", "Tech", "Business", "Science", "World", "Other"];
+const ALL_CATEGORIES: TrendCategory[] = [
+  "AI/LLM",
+  "Frontend",
+  "GIS",
+  "Japanese",
+  "Other",
+];
 
 // ── Helpers ─────────────────────────────────────────────────
-function getImpactClass(score: number) {
-  if (score >= 8) return "score-high";
-  if (score >= 5) return "score-medium";
-  return "score-low";
+function formatPublishedAt(isoStr: string): string {
+  try {
+    const d = new Date(isoStr);
+    if (d.getTime() === 0) return "日付不明";
+    const now = new Date();
+    const diff = now.getTime() - d.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    if (hours < 1) return "1時間以内";
+    if (hours < 24) return `${hours}時間前`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}日前`;
+    return `${d.getMonth() + 1}/${d.getDate()}`;
+  } catch {
+    return isoStr;
+  }
 }
 
 function formatFetchedAt(isoStr: string): string {
   try {
     const d = new Date(isoStr);
     return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")} 取得`;
-  } catch { return isoStr; }
+  } catch {
+    return isoStr;
+  }
 }
 
-function daysUntilExpiry(isoStr: string): number {
+function minutesUntilExpiry(isoStr: string): number {
   const age = Date.now() - new Date(isoStr).getTime();
-  return Math.max(0, Math.ceil((CACHE_TTL_MS - age) / (24 * 60 * 60 * 1000)));
-}
-
-/** URLをクリックで新タブ展開 */
-function openUrl(url: string | undefined) {
-  if (!url) return;
-  window.open(url, "_blank", "noopener,noreferrer");
+  return Math.max(0, Math.ceil((CACHE_TTL_MS - age) / (1000 * 60)));
 }
 
 // ── Page ────────────────────────────────────────────────────
@@ -113,16 +160,10 @@ export default function TrendPage() {
   const [data, setData] = useState<TrendResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState<TrendCategory | "All">("All");
-  const [loadingStep, setLoadingStep] = useState("ウェブを検索中...");
+  const [activeCategory, setActiveCategory] = useState<TrendCategory | "All">(
+    "All",
+  );
   const [fromCache, setFromCache] = useState(false);
-
-  const LOADING_STEPS = [
-    "ウェブを検索中...",
-    "ニュースを解析中...",
-    "トレンドを分類中...",
-    "まとめを生成中...",
-  ];
 
   useEffect(() => {
     setMounted(true);
@@ -136,14 +177,6 @@ export default function TrendPage() {
   const fetchTrends = useCallback(async () => {
     setLoading(true);
     setError(null);
-    setLoadingStep(LOADING_STEPS[0]);
-
-    let stepIdx = 0;
-    const stepTimer = setInterval(() => {
-      stepIdx = (stepIdx + 1) % LOADING_STEPS.length;
-      setLoadingStep(LOADING_STEPS[stepIdx]);
-    }, 4000);
-
     try {
       const res = await fetch("/api/trends", { cache: "no-store" });
       if (!res.ok) {
@@ -157,7 +190,6 @@ export default function TrendPage() {
     } catch (err) {
       setError((err as Error).message);
     } finally {
-      clearInterval(stepTimer);
       setLoading(false);
     }
   }, []);
@@ -166,34 +198,39 @@ export default function TrendPage() {
 
   // ── フィルター ──────────────────────────────────────────
   const filteredItems = (data?.items ?? []).filter(
-    (item) => activeCategory === "All" || item.category === activeCategory
+    (item) => activeCategory === "All" || item.category === activeCategory,
   );
 
   const featuredItem =
     filteredItems.find((item) => item.isFeatured) ?? filteredItems[0] ?? null;
-  const restItems = filteredItems.filter((item) => item.id !== featuredItem?.id);
+  const restItems = filteredItems.filter(
+    (item) => item.id !== featuredItem?.id,
+  );
 
   const categoryCounts = (data?.items ?? []).reduce<Record<string, number>>(
     (acc, item) => {
       acc[item.category] = (acc[item.category] ?? 0) + 1;
       return acc;
     },
-    {}
+    {},
   );
 
-  const daysLeft = data ? daysUntilExpiry(data.fetchedAt) : 0;
+  const minsLeft = data ? minutesUntilExpiry(data.fetchedAt) : 0;
+  const isStale = minsLeft <= 10;
 
   return (
     <div className="stagger">
-      {/* ── Header ── */}
+      {/* ── Header meta ── */}
       <div className="trend-header-left">
         {data && (
           <div className="trend-last-updated">
-            <span className={`trend-last-updated-dot${daysLeft <= 1 ? " stale" : ""}`} />
+            <span
+              className={`trend-last-updated-dot${isStale ? " stale" : ""}`}
+            />
             {formatFetchedAt(data.fetchedAt)}
             {fromCache && (
               <span className="trend-cache-badge">
-                キャッシュ（あと{daysLeft}日）
+                キャッシュ（あと{minsLeft}分）
               </span>
             )}
           </div>
@@ -201,7 +238,7 @@ export default function TrendPage() {
         {!data && !loading && (
           <div className="trend-last-updated">
             <span className="trend-last-updated-dot stale" />
-            未取得 — 週1回の更新
+            未取得 — 1時間キャッシュ
           </div>
         )}
       </div>
@@ -228,6 +265,7 @@ export default function TrendPage() {
                   key={cat}
                   className={`trend-filter-btn${activeCategory === cat ? " active" : ""}`}
                   onClick={() => setActiveCategory(cat)}
+                  title={cfg.description}
                 >
                   <Icon size={12} />
                   {cfg.label}
@@ -242,21 +280,24 @@ export default function TrendPage() {
           {fromCache && data && (
             <button
               className="trend-force-btn"
-              onClick={() => { clearCache(); fetchTrends(); }}
+              onClick={() => {
+                clearCache();
+                fetchTrends();
+              }}
               disabled={loading}
-              title="キャッシュを無視して強制更新（API使用量あり）"
+              title="キャッシュを無視して強制更新"
             >
               <RefreshCw
                 size={13}
                 style={loading ? { animation: "tspin 1s linear infinite" } : {}}
               />
-              強制更新
+              更新
             </button>
           )}
           {!data && !loading && (
             <button className="trend-fetch-btn" onClick={fetchTrends}>
               <Zap size={14} />
-              トレンドを取得
+              RSSを取得
             </button>
           )}
           {loading && (
@@ -275,17 +316,13 @@ export default function TrendPage() {
       {loading && (
         <div className="trend-loading animate-fade-up">
           <div className="trend-loading-icon">
-            <Zap size={24} />
+            <Globe size={24} />
           </div>
-          <div className="trend-loading-title">最新トレンドを取得中</div>
+          <div className="trend-loading-title">RSSフィードを取得中</div>
           <div className="trend-loading-desc">
-            AIがウェブを検索してトレンドをキュレーションしています。
+            Anthropic・OpenAI・Vercel・Next.js・Zenn・Qiita・ESRIジャパン
             <br />
-            完了後は7日間キャッシュされます。
-          </div>
-          <div className="trend-loading-progress">
-            <span className="trend-loading-step">{loadingStep}</span>
-            <span className="trend-loading-cursor" />
+            から最新記事を並列取得しています。
           </div>
         </div>
       )}
@@ -310,11 +347,13 @@ export default function TrendPage() {
           <div className="trend-empty-icon">
             <TrendingUp size={24} />
           </div>
-          <div className="trend-empty-title">トレンドがまだ取得されていません</div>
+          <div className="trend-empty-title">
+            RSSフィードがまだ取得されていません
+          </div>
           <div className="trend-empty-desc">
-            「トレンドを取得」ボタンから最新情報を取得してください。
+            「RSSを取得」から最新記事を取得してください。
             <br />
-            取得後は<strong>7日間キャッシュ</strong>されるので、毎回APIを消費しません。
+            取得後は<strong>1時間キャッシュ</strong>されます。
           </div>
           <button
             className="trend-fetch-btn"
@@ -327,31 +366,19 @@ export default function TrendPage() {
         </div>
       )}
 
-      {/* ── AI Digest ── */}
-      {!loading && data && activeCategory === "All" && data.digest && (
-        <div className="trend-digest">
-          <div className="trend-digest-header">
-            <div className="trend-digest-icon">
-              <Sparkles size={15} />
-            </div>
-            <span className="trend-digest-title">AI ダイジェスト</span>
-          </div>
-          <div className="trend-digest-body">{data.digest}</div>
-        </div>
-      )}
-
       {/* ── Featured ── */}
       {!loading && featuredItem && (
-        <div
-          className={`trend-featured${featuredItem.sourceUrl ? " has-url" : ""}`}
-          onClick={() => openUrl(featuredItem.sourceUrl)}
-          title={featuredItem.sourceUrl ? "クリックして記事を開く" : undefined}
+        <a
+          className="trend-featured has-url"
+          href={featuredItem.sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
         >
-          <div className="trend-featured-label">
-            Top Trend
-          </div>
+          <div className="trend-featured-label">Latest</div>
           <div className="trend-featured-title">{featuredItem.title}</div>
-          <div className="trend-featured-summary">{featuredItem.summary}</div>
+          {featuredItem.summary && (
+            <div className="trend-featured-summary">{featuredItem.summary}</div>
+          )}
           <div className="trend-featured-meta">
             {(() => {
               const cfg = CATEGORY_CONFIG[featuredItem.category];
@@ -363,13 +390,14 @@ export default function TrendPage() {
                 </span>
               );
             })()}
-            {featuredItem.keywords.slice(0, 3).map((kw) => (
-              <span key={kw} className="trend-badge trend-badge-keyword">
-                {kw}
-              </span>
-            ))}
+            <span className="trend-badge trend-badge-keyword">
+              {featuredItem.sourceName}
+            </span>
+            <span className="trend-badge trend-badge-keyword trend-badge-time">
+              {formatPublishedAt(featuredItem.publishedAt)}
+            </span>
           </div>
-        </div>
+        </a>
       )}
 
       {/* ── Grid ── */}
@@ -379,31 +407,32 @@ export default function TrendPage() {
             const cfg = CATEGORY_CONFIG[item.category];
             const Icon = cfg.icon;
             return (
-              <div
+              <a
                 key={item.id}
-                className={`trend-card ${cfg.cardClass}${item.sourceUrl ? " has-url" : ""}`}
-                onClick={() => openUrl(item.sourceUrl)}
-                title={item.sourceUrl ? "クリックして記事を開く" : undefined}
+                className={`trend-card ${cfg.cardClass} has-url`}
+                href={item.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 <div className="trend-card-header">
                   <div className="trend-card-title">{item.title}</div>
-                  <div className={`trend-impact-score ${getImpactClass(item.impactScore)}`}>
-                    {item.impactScore}
+                  <div className="trend-card-time">
+                    {formatPublishedAt(item.publishedAt)}
                   </div>
                 </div>
-                <div className="trend-card-summary">{item.summary}</div>
+                {item.summary && (
+                  <div className="trend-card-summary">{item.summary}</div>
+                )}
                 <div className="trend-card-footer">
                   <span className={`trend-badge ${cfg.badgeClass}`}>
                     <Icon size={10} />
                     {cfg.label}
                   </span>
-                  {item.keywords.slice(0, 2).map((kw) => (
-                    <span key={kw} className="trend-badge trend-badge-keyword">
-                      {kw}
-                    </span>
-                  ))}
+                  <span className="trend-badge trend-badge-keyword">
+                    {item.sourceName}
+                  </span>
                 </div>
-              </div>
+              </a>
             );
           })}
         </div>

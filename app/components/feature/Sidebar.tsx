@@ -24,7 +24,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
   ListChecks,
-  TowelRack
+  TowelRack,
 } from "lucide-react";
 import { NavSection } from "../ui/NavSection/NavSection";
 import type { NavItem, SidebarUser } from "@/app/types/Sidebar";
@@ -49,6 +49,14 @@ const MAIN_NAV: NavItem[] = [
   { href: "/trends", icon: TrendingUp, label: "トレンド" },
 ];
 
+const SETTINGS: NavItem[] = [
+  {
+    href: "/settings",
+    icon: Settings,
+    label: "設定",
+  },
+];
+
 const SERVICE_NAV: NavItem[] = [
   {
     href: "https://claude.ai/",
@@ -71,15 +79,11 @@ const SERVICE_NAV: NavItem[] = [
     label: "目標管理ポータル",
   },
   {
-    href: "https://www.notion.so/325fab19d29580dfaf52fad46b92629f?source=copy_link",
+    href: "https://www.notion.so/335fab19d295802eac64cfb737151bb8",
     icon: Target,
     label: "プロジェクトポータル",
   },
 ];
-
-// const SYSTEM_NAV: NavItem[] = [
-//   { href: "/settings", icon: Settings, label: "Settings" },
-// ];
 
 // ===========================================================
 // Components
@@ -131,6 +135,14 @@ export default function Sidebar({ user }: { user: SidebarUser | null }) {
           <NavSection
             label="外部サービス"
             items={SERVICE_NAV}
+            isActive={isActive}
+            expanded={expanded}
+            onToggle={toggleExpand}
+          />
+
+          <NavSection
+            label="設定"
+            items={SETTINGS}
             isActive={isActive}
             expanded={expanded}
             onToggle={toggleExpand}

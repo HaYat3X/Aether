@@ -8,45 +8,45 @@
 
 @theme {
   /* ── Dark Mode Backgrounds (default) ── */
-  --color-bg-base: #030711;
+  /* --color-bg-base: #030711;
   --color-bg-sidebar: #060b17;
   --color-bg-surface: #0a1120;
   --color-bg-elevated: #0f172a;
   --color-bg-input: #0c1527;
-  --color-bg-hover: #111a30;
+  --color-bg-hover: #111a30; */
 
   /* Glass */
-  --color-glass: rgba(8, 14, 28, 0.5);
-  --color-glass-border: rgba(255, 255, 255, 0.04);
+  /* --color-glass: rgba(8, 14, 28, 0.5);
+  --color-glass-border: rgba(255, 255, 255, 0.04); */
 
   /* Accent — dark mode blue */
-  --color-accent: #3b82f6;
+  /* --color-accent: #3b82f6;
   --color-accent-bright: #60a5fa;
   --color-accent-dim: #2563eb;
   --color-accent-glow: rgba(59, 130, 246, 0.35);
   --color-accent-glow-sm: rgba(59, 130, 246, 0.15);
-  --color-accent-glow-subtle: rgba(59, 130, 246, 0.06);
+  --color-accent-glow-subtle: rgba(59, 130, 246, 0.06); */
 
   /* Sub Accents */
-  --color-purple: #a78bfa;
+  /* --color-purple: #a78bfa;
   --color-green: #34d399;
   --color-amber: #fbbf24;
   --color-pink: #f472b6;
-  --color-red: #f87171;
+  --color-red: #f87171; */
 
   /* Text */
-  --color-text-primary: #e2e8f0;
+  /* --color-text-primary: #e2e8f0;
   --color-text-secondary: #8896ab;
   --color-text-muted: #3e4c63;
-  --color-text-dim: #293548;
+  --color-text-dim: #293548; */
 
   /* Border */
-  --color-border: rgba(255, 255, 255, 0.04);
+  /* --color-border: rgba(255, 255, 255, 0.04);
   --color-border-hover: rgba(255, 255, 255, 0.07);
-  --color-border-accent: rgba(59, 130, 246, 0.15);
+  --color-border-accent: rgba(59, 130, 246, 0.15); */
 
   /* Sidebar */
-  --sidebar-width: 225px;
+  /* --sidebar-width: 225px; */
 }
 
 /* ============================================
@@ -108,7 +108,6 @@
 }
 
 @keyframes pulseGlowLight {
-
   0%,
   100% {
     box-shadow: 0 0 6px rgba(204, 85, 34, 0.2);
@@ -171,9 +170,11 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg,
-      var(--color-accent) 0%,
-      var(--color-accent-dim) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    var(--color-accent-dim) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -292,7 +293,7 @@ body {
   color: var(--color-text-primary);
 }
 
-.nav-item.active>svg {
+.nav-item.active > svg {
   opacity: 1;
   color: var(--color-accent-bright);
 }
@@ -412,9 +413,11 @@ body {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg,
-      var(--color-accent-dim),
-      var(--color-purple));
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-dim),
+    var(--color-purple)
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -528,27 +531,27 @@ body {
   animation: fadeUp 0.45s ease-out both;
 }
 
-.stagger>*:nth-child(1) {
+.stagger > *:nth-child(1) {
   animation-delay: 0ms;
 }
 
-.stagger>*:nth-child(2) {
+.stagger > *:nth-child(2) {
   animation-delay: 50ms;
 }
 
-.stagger>*:nth-child(3) {
+.stagger > *:nth-child(3) {
   animation-delay: 100ms;
 }
 
-.stagger>*:nth-child(4) {
+.stagger > *:nth-child(4) {
   animation-delay: 150ms;
 }
 
-.stagger>*:nth-child(5) {
+.stagger > *:nth-child(5) {
   animation-delay: 200ms;
 }
 
-.stagger>*:nth-child(6) {
+.stagger > *:nth-child(6) {
   animation-delay: 250ms;
 }
 
@@ -557,7 +560,6 @@ body {
    ============================================ */
 
 @keyframes typingDot {
-
   0%,
   60%,
   100% {
@@ -590,12 +592,3 @@ body {
 [data-theme="light"] .typing-dot {
   background: var(--color-text-muted);
 }
-
-/* ====================================================== */
-/* Dashboard Sidebar State Management */
-/* ====================================================== */
-
-/* CSS兄弟セレクタを使用してサイドバー状態に応じてmainを調整 */
-/* .sidebar.sidebar-collapsed ~ .dashboard-main {
-  margin-left: 0 !important;
-} */

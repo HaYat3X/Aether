@@ -29,11 +29,15 @@ export default async function DashboardLayout({
       >
         {/* Fixed header */}
         <div className="shrink-0 px-9 pt-7">
-          <PageHeader />
+          <div className="mx-auto w-full max-w-[1200px]">
+            <PageHeader />
+          </div>
         </div>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-9 pb-9">{children}</div>
+        <div className="flex-1 overflow-y-auto px-9 pb-9">
+          <div className="mx-auto w-full max-w-[1200px] h-full">{children}</div>
+        </div>
       </main>
     </div>
   );
