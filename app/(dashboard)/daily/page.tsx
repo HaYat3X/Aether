@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import "./main.css";
 import {
   Clock,
@@ -17,13 +17,20 @@ import {
   Loader2,
   RefreshCw,
   AlertCircle,
+  ExternalLink,
+  ChevronDown,
 } from "lucide-react";
 
 /* ──────────────────────────────────────────
    Types
    ────────────────────────────────────────── */
 type DailyPlanStatus = "未着手" | "進行中" | "完了" | "予定変更" | "保留";
-type DailyPlanCategory = "目標関連" | "実務・定常" | "プロジェクト" | "突発・その他" | "雑務";
+type DailyPlanCategory =
+  | "目標関連"
+  | "実務・定常"
+  | "プロジェクト"
+  | "突発・その他"
+  | "雑務";
 
 type DailyPlanItem = {
   id: string;
@@ -33,12 +40,18 @@ type DailyPlanItem = {
   status: DailyPlanStatus;
   category?: DailyPlanCategory | null;
   memo?: string | null;
-  targetProgress?: number | null;
-  actualProgress?: number | null;
   relatedTaskIds?: string[];
   icon: string;
   url?: string | null;
 };
+
+const ALL_STATUSES: DailyPlanStatus[] = [
+  "未着手",
+  "進行中",
+  "完了",
+  "予定変更",
+  "保留",
+];
 
 /* ──────────────────────────────────────────
    Time Helpers
@@ -87,60 +100,75 @@ function formatDateLabel(dateStr: string): string {
    ────────────────────────────────────────── */
 function getIconComponent(key: string, size = 14) {
   switch (key) {
-    case "mail": return <Zap size={size} />;
-    case "users": return <Users size={size} />;
-    case "code": return <Monitor size={size} />;
-    case "lunch": return <Utensils size={size} />;
-    case "review": return <BookOpen size={size} />;
-    case "doc": return <FileText size={size} />;
-    case "reflect": return <Coffee size={size} />;
-    default: return <Clock size={size} />;
-  }
-}
-
-function getStatusDotClass(status: DailyPlanStatus): string {
-  switch (status) {
-    case "完了": return "status-done";
-    case "進行中": return "status-in-progress";
-    case "予定変更": return "status-changed";
-    case "保留": return "status-hold";
-    case "未着手": return "status-todo";
-    default: return "status-todo";
+    case "mail":
+      return <Zap size={size} />;
+    case "users":
+      return <Users size={size} />;
+    case "code":
+      return <Monitor size={size} />;
+    case "lunch":
+      return <Utensils size={size} />;
+    case "review":
+      return <BookOpen size={size} />;
+    case "doc":
+      return <FileText size={size} />;
+    case "reflect":
+      return <Coffee size={size} />;
+    default:
+      return <Clock size={size} />;
   }
 }
 
 function getStatusBadgeClass(status: DailyPlanStatus): string {
   switch (status) {
-    case "完了": return "badge-status-done";
-    case "進行中": return "badge-status";
-    case "予定変更": return "badge-status-changed";
-    case "保留": return "badge-status-hold";
-    case "未着手": return "badge-status-todo";
-    default: return "badge-status-todo";
+    case "完了":
+      return "badge-status-done";
+    case "進行中":
+      return "badge-status";
+    case "予定変更":
+      return "badge-status-changed";
+    case "保留":
+      return "badge-status-hold";
+    case "未着手":
+      return "badge-status-todo";
+    default:
+      return "badge-status-todo";
   }
 }
 
 function getCategoryCardClass(category?: DailyPlanCategory | null): string {
   if (!category) return "";
   switch (category) {
-    case "目標関連": return "cat-goal";
-    case "実務・定常": return "cat-routine";
-    case "プロジェクト": return "cat-project";
-    case "突発・その他": return "cat-adhoc";
-    case "雑務": return "cat-misc";
-    default: return "";
+    case "目標関連":
+      return "cat-goal";
+    case "実務・定常":
+      return "cat-routine";
+    case "プロジェクト":
+      return "cat-project";
+    case "突発・その他":
+      return "cat-adhoc";
+    case "雑務":
+      return "cat-misc";
+    default:
+      return "";
   }
 }
 
 function getCategoryBadgeClass(category?: DailyPlanCategory | null): string {
   if (!category) return "";
   switch (category) {
-    case "目標関連": return "badge-cat-goal";
-    case "実務・定常": return "badge-cat-routine";
-    case "プロジェクト": return "badge-cat-project";
-    case "突発・その他": return "badge-cat-adhoc";
-    case "雑務": return "badge-cat-misc";
-    default: return "";
+    case "目標関連":
+      return "badge-cat-goal";
+    case "実務・定常":
+      return "badge-cat-routine";
+    case "プロジェクト":
+      return "badge-cat-project";
+    case "突発・その他":
+      return "badge-cat-adhoc";
+    case "雑務":
+      return "badge-cat-misc";
+    default:
+      return "";
   }
 }
 
@@ -149,16 +177,11 @@ function isCurrent(item: DailyPlanItem): boolean {
   return item.status === "進行中";
 }
 
-function pct(n: number | null | undefined): string {
-  if (n === null || n === undefined) return "0%";
-  return `${Math.round(n * 100)}%`;
-}
-
 function calcDuration(start: string, end: string): string {
   if (!start || !end) return "";
   const [sh, sm] = start.split(":").map(Number);
   const [eh, em] = end.split(":").map(Number);
-  const mins = (eh * 60 + em) - (sh * 60 + sm);
+  const mins = eh * 60 + em - (sh * 60 + sm);
   if (mins <= 0) return "";
   if (mins < 60) return `${mins}min`;
   const h = Math.floor(mins / 60);
@@ -167,39 +190,71 @@ function calcDuration(start: string, end: string): string {
 }
 
 /* ──────────────────────────────────────────
-   TimelineCard — Notion リンク付きカード
-   url があれば <a>、なければ <div> にフォールバック
+   StatusDropdown
    ────────────────────────────────────────── */
-function TimelineCard({
+function StatusDropdown({
   item,
-  children,
-  className,
+  onUpdate,
+  updating,
 }: {
   item: DailyPlanItem;
-  children: React.ReactNode;
-  className: string;
+  onUpdate: (id: string, status: DailyPlanStatus) => void;
+  updating: boolean;
 }) {
-  if (item.url) {
-    return (
-      <a
-        href={item.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`timeline-card ${className}`}
-        style={{ position: "relative" }}
-        title={`Notionで開く: ${item.title}`}
-      >
-        {children}
-      </a>
-    );
-  }
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    if (open) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
 
   return (
     <div
-      className={`timeline-card no-link ${className}`}
-      style={{ position: "relative" }}
+      ref={ref}
+      className="status-dropdown-wrapper"
+      onClick={(e) => e.stopPropagation()}
     >
-      {children}
+      <button
+        className={`timeline-badge ${getStatusBadgeClass(item.status)} status-badge-btn${updating ? " updating" : ""}`}
+        onClick={() => setOpen((p) => !p)}
+        disabled={updating}
+        title="ステータスを変更"
+      >
+        {updating ? (
+          <Loader2 size={10} className="status-updating-icon" />
+        ) : null}
+        {item.status}
+        <ChevronDown
+          size={10}
+          className={`status-chevron${open ? " open" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="status-dropdown">
+          {ALL_STATUSES.map((s) => (
+            <button
+              key={s}
+              className={`status-dropdown-item${s === item.status ? " active" : ""}`}
+              onClick={() => {
+                setOpen(false);
+                if (s !== item.status) onUpdate(item.id, s);
+              }}
+            >
+              <span
+                className={`status-dropdown-dot ${getStatusBadgeClass(s)}`}
+              />
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -213,6 +268,7 @@ export default function DailyPlanPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [nowMinutes, setNowMinutes] = useState(getNowJSTMinutes);
+  const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -247,24 +303,47 @@ export default function DailyPlanPage() {
     fetchData(date);
   }, [date, fetchData]);
 
+  /* ── ステータス更新（楽観的） ── */
+  const handleStatusUpdate = useCallback(
+    async (id: string, newStatus: DailyPlanStatus) => {
+      // 楽観的更新
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, status: newStatus } : item,
+        ),
+      );
+      setUpdatingIds((prev) => new Set(prev).add(id));
+
+      try {
+        const res = await fetch("/api/daily-plan", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, status: newStatus }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: "API error" }));
+          throw new Error(err.error || `HTTP ${res.status}`);
+        }
+      } catch (err) {
+        console.error("[DailyPlan] status update error:", err);
+        // ロールバック: 再フェッチで最新状態に戻す
+        fetchData(date);
+      } finally {
+        setUpdatingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }
+    },
+    [date, fetchData],
+  );
+
   const goToday = () => setDate(getTodayJST());
   const goPrev = () => setDate((d) => addDays(d, -1));
   const goNext = () => setDate((d) => addDays(d, 1));
   const refresh = () => fetchData(date);
-
-  // Stats
-  const total = items.length;
-  const done = items.filter((i) => i.status === "完了").length;
-  const inProgress = items.filter((i) => i.status === "進行中").length;
-  const progressPct = total > 0 ? Math.round((done / total) * 100) : 0;
-
-  const totalMins = items.reduce((sum, i) => {
-    if (!i.startTime || !i.endTime) return sum;
-    const [sh, sm] = i.startTime.split(":").map(Number);
-    const [eh, em] = i.endTime.split(":").map(Number);
-    return sum + Math.max(0, (eh * 60 + em) - (sh * 60 + sm));
-  }, 0);
-  const totalHours = (totalMins / 60).toFixed(1);
 
   const isToday = date === getTodayJST();
 
@@ -287,11 +366,7 @@ export default function DailyPlanPage() {
           <ChevronRight size={16} />
         </button>
 
-        <button
-          className="refresh-btn"
-          onClick={refresh}
-          disabled={loading}
-        >
+        <button className="refresh-btn" onClick={refresh} disabled={loading}>
           <RefreshCw
             size={14}
             style={loading ? { animation: "spin 1s linear infinite" } : {}}
@@ -330,7 +405,8 @@ export default function DailyPlanPage() {
           </div>
           <div className="daily-empty-title">プランが未作成です</div>
           <div className="daily-empty-desc">
-            AIアシスタントに「デイリープランを作って」と話しかけると、<br />
+            AIアシスタントに「デイリープランを作って」と話しかけると、
+            <br />
             今日のスケジュールとタスクから自動でプランを作成します。
           </div>
         </div>
@@ -366,7 +442,12 @@ export default function DailyPlanPage() {
                 nowMinutes < itemEnd &&
                 itemEnd > itemStart;
 
-              if (isToday_ && !nowLineRendered && !isNowInside && nowMinutes < itemStart) {
+              if (
+                isToday_ &&
+                !nowLineRendered &&
+                !isNowInside &&
+                nowMinutes < itemStart
+              ) {
                 elements.push(NowLineBetween);
                 nowLineRendered = true;
               }
@@ -380,6 +461,7 @@ export default function DailyPlanPage() {
               const current = isCurrent(item);
               const isDone = item.status === "完了";
               const duration = calcDuration(item.startTime, item.endTime);
+              const isUpdating = updatingIds.has(item.id);
 
               const cardClassName = [
                 current ? "is-current" : "",
@@ -398,12 +480,14 @@ export default function DailyPlanPage() {
                   </div>
 
                   {/* Dot */}
-                  <div className="timeline-dot-col">
-                  </div>
+                  <div className="timeline-dot-col" />
 
-                  {/* Card */}
+                  {/* Card — 常に div、Notionリンクはアイコンボタンで */}
                   <div className="timeline-content">
-                    <TimelineCard item={item} className={cardClassName}>
+                    <div
+                      className={`timeline-card ${cardClassName}`}
+                      style={{ position: "relative" }}
+                    >
                       {/* Now indicator overlay */}
                       {nowPct >= 0 && (
                         <div
@@ -420,10 +504,31 @@ export default function DailyPlanPage() {
                         <span className="timeline-card-icon">
                           {getIconComponent(item.icon)}
                         </span>
-                        <span className="timeline-card-title">{item.title}</span>
-                        <span className={`timeline-badge ${getStatusBadgeClass(item.status)}`}>
-                          {item.status}
+                        <span className="timeline-card-title">
+                          {item.title}
                         </span>
+
+                        {/* Notionリンクボタン */}
+                        {item.url && (
+                          <a
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="timeline-notion-link"
+                            title="Notionで開く"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <ExternalLink size={12} />
+                          </a>
+                        )}
+
+                        {/* ステータスドロップダウン */}
+                        <StatusDropdown
+                          item={item}
+                          onUpdate={handleStatusUpdate}
+                          updating={isUpdating}
+                        />
+
                         {duration && (
                           <span className="timeline-badge badge-task">
                             {duration}
@@ -434,55 +539,28 @@ export default function DailyPlanPage() {
                       {/* Meta */}
                       <div className="timeline-card-meta">
                         {item.category && (
-                          <span className={`timeline-badge ${getCategoryBadgeClass(item.category)}`}>
+                          <span
+                            className={`timeline-badge ${getCategoryBadgeClass(item.category)}`}
+                          >
                             {item.category}
                           </span>
                         )}
-                        {item.relatedTaskIds && item.relatedTaskIds.length > 0 && (
-                          <span className="timeline-badge badge-task">
-                            <LinkIcon size={10} />
-                            タスク {item.relatedTaskIds.length}件
-                          </span>
-                        )}
+                        {item.relatedTaskIds &&
+                          item.relatedTaskIds.length > 0 && (
+                            <span className="timeline-badge badge-task">
+                              <LinkIcon size={10} />
+                              タスク {item.relatedTaskIds.length}件
+                            </span>
+                          )}
                       </div>
-
-                      {/* Progress */}
-                      {item.targetProgress != null && (
-                        <div className="timeline-progress-row">
-                          <span className="timeline-progress-label">目標</span>
-                          <div className="timeline-progress-track">
-                            <div
-                              className="timeline-progress-fill fill-target"
-                              style={{ width: pct(item.targetProgress) }}
-                            />
-                          </div>
-                          <span className="timeline-progress-pct">
-                            {pct(item.targetProgress)}
-                          </span>
-                        </div>
-                      )}
-                      {item.actualProgress != null && (
-                        <div className="timeline-progress-row">
-                          <span className="timeline-progress-label">実績</span>
-                          <div className="timeline-progress-track">
-                            <div
-                              className="timeline-progress-fill fill-actual"
-                              style={{ width: pct(item.actualProgress) }}
-                            />
-                          </div>
-                          <span className="timeline-progress-pct">
-                            {pct(item.actualProgress)}
-                          </span>
-                        </div>
-                      )}
 
                       {/* Memo */}
                       {item.memo && (
                         <div className="timeline-memo">{item.memo}</div>
                       )}
-                    </TimelineCard>
+                    </div>
                   </div>
-                </div>
+                </div>,
               );
             });
 

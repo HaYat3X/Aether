@@ -163,7 +163,9 @@
   backdrop-filter: blur(8px);
   /* ライトモードは blur(8px) */
   -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .05), 0 4px 12px rgba(0, 0, 0, .03);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 4px 12px rgba(0, 0, 0, 0.03);
   transition: border-color 0.2s ease;
 }
 
@@ -214,7 +216,11 @@
 .daily-progress-fill {
   height: 100%;
   border-radius: 3px;
-  background: linear-gradient(90deg, var(--color-accent-dim), var(--color-accent));
+  background: linear-gradient(
+    90deg,
+    var(--color-accent-dim),
+    var(--color-accent)
+  );
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -231,11 +237,13 @@
   top: 0;
   bottom: 0;
   width: 1px;
-  background: linear-gradient(180deg,
-      transparent 0%,
-      var(--color-border-hover) 4%,
-      var(--color-border-hover) 96%,
-      transparent 100%);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--color-border-hover) 4%,
+    var(--color-border-hover) 96%,
+    transparent 100%
+  );
 }
 
 /* ── Timeline Item ── */
@@ -326,14 +334,13 @@
 
 /* DESIGN.md 7 — オレンジ系 pulseGlow */
 @keyframes pulseGlow {
-
   0%,
   100% {
-    box-shadow: 0 0 6px rgba(204, 85, 34, 0.20);
+    box-shadow: 0 0 6px rgba(204, 85, 34, 0.2);
   }
 
   50% {
-    box-shadow: 0 0 14px rgba(204, 85, 34, 0.40);
+    box-shadow: 0 0 14px rgba(204, 85, 34, 0.4);
   }
 }
 
@@ -359,20 +366,20 @@
   text-decoration: none;
   display: block;
   color: inherit;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .timeline-card:hover {
   border-color: var(--color-border-hover);
   /* rgba(0,0,0,.12) */
   background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .07);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
   transform: translateY(-1px);
 }
 
 .timeline-card:active {
   transform: translateY(0);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 /* Notion リンクなし（url未設定）の場合はポインターを戻す */
@@ -382,7 +389,7 @@
 
 .timeline-card.no-link:hover {
   transform: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 /* Cards with category left-border */
@@ -706,7 +713,9 @@
   height: 10px;
   border-radius: 50%;
   background: var(--color-red);
-  box-shadow: 0 0 8px rgba(184, 48, 48, 0.4), 0 0 16px rgba(184, 48, 48, 0.15);
+  box-shadow:
+    0 0 8px rgba(184, 48, 48, 0.4),
+    0 0 16px rgba(184, 48, 48, 0.15);
 }
 
 .timeline-now-rule {
@@ -823,4 +832,200 @@
   border-color: var(--color-border-accent);
   color: var(--color-accent);
   background: var(--color-accent-glow-subtle);
+}
+/* ============================================
+   Status Dropdown
+   ============================================ */
+
+.status-dropdown-wrapper {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+/* ステータスバッジをボタン化 */
+.status-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.status-badge-btn:hover {
+  filter: brightness(0.92);
+}
+
+.status-badge-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.status-badge-btn.updating {
+  opacity: 0.7;
+}
+
+.status-chevron {
+  transition: transform 0.18s ease;
+  opacity: 0.7;
+}
+
+.status-chevron.open {
+  transform: rotate(180deg);
+}
+
+@keyframes statusSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.status-updating-icon {
+  animation: statusSpin 0.8s linear infinite;
+}
+
+/* ドロップダウンメニュー */
+.status-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 120px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-hover);
+  border-radius: 10px;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.1),
+    0 1px 4px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  z-index: 50;
+  animation: dropdownIn 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes dropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.status-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 12.5px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s ease;
+}
+
+.status-dropdown-item:hover {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+}
+
+.status-dropdown-item.active {
+  color: var(--color-text-primary);
+  font-weight: 600;
+  background: var(--color-accent-glow-subtle);
+}
+
+/* ドットはバッジクラスを流用して色を合わせる */
+.status-dropdown-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ドット色をバッジ背景色から引き継ぐ */
+.status-dropdown-dot.badge-status-done {
+  background: var(--color-green);
+}
+.status-dropdown-dot.badge-status {
+  background: #2783de;
+}
+.status-dropdown-dot.badge-status-changed {
+  background: var(--color-amber);
+}
+.status-dropdown-dot.badge-status-hold {
+  background: var(--color-purple);
+}
+.status-dropdown-dot.badge-status-todo {
+  background: var(--color-text-muted);
+}
+
+/* ============================================
+   Notion Link Button (カードヘッダー内)
+   ============================================ */
+
+.timeline-notion-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: var(--color-text-dim);
+  text-decoration: none;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  opacity: 0;
+}
+
+.timeline-card:hover .timeline-notion-link {
+  opacity: 1;
+}
+
+.timeline-notion-link:hover {
+  background: var(--color-accent-glow-subtle);
+  color: var(--color-accent);
+}
+
+/* ============================================
+   Status Dropdown overflow/z-index fix
+   ============================================ */
+
+.timeline-card {
+  overflow: visible !important;
+}
+
+.timeline-content {
+  overflow: visible;
+}
+
+.timeline-item {
+  overflow: visible;
+}
+
+.status-dropdown-wrapper {
+  overflow: visible;
+}
+
+.status-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 130px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-hover);
+  border-radius: 10px;
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  z-index: 9999;
+  animation: dropdownIn 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
