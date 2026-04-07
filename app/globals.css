@@ -47,6 +47,56 @@
 
   /* Sidebar */
   /* --sidebar-width: 225px; */
+  /* ── Backgrounds ── */
+  --color-bg-base: #f5f3ef;
+  /* ページ全体の最背面。温かみのあるオフホワイト */
+  --color-bg-sidebar: #edeae3;
+  /* サイドバー。ベースより少しだけ濃くして奥行き */
+  --color-bg-surface: #ffffff;
+  /* メインコンテンツエリア、カード */
+  --color-bg-elevated: #faf9f6;
+  /* 入力欄、ホバー時の浮き上がり */
+  --color-bg-input: #f5f3ef;
+  /* テキストインプット */
+  --color-bg-hover: #ede9e1;
+  /* ホバー時の背景 */
+
+  /* ── Glass (半透明白) ── */
+  --color-glass: rgba(255, 255, 255, 0.7);
+  --color-glass-border: rgba(0, 0, 0, 0.06);
+
+  /* ── Accent — Anthropic Terracotta Orange ── */
+  --color-accent: #cc5522;
+  /* メインアクセント。テラコッタオレンジ */
+  --color-accent-bright: #b84a1a;
+  /* ホバー時など、少し締めた版 */
+  --color-accent-dim: #e06030;
+  /* ライトな文脈での使用 */
+  --color-accent-glow: rgba(204, 85, 34, 0.2);
+  --color-accent-glow-sm: rgba(204, 85, 34, 0.12);
+  --color-accent-glow-subtle: rgba(204, 85, 34, 0.06);
+
+  /* ── Semantic Colors ── */
+  --color-purple: #6b54b8;
+  --color-green: #2d8259;
+  --color-amber: #c07a20;
+  --color-pink: #b83060;
+  --color-red: #b83030;
+
+  /* ── Text — 4段階ヒエラルキー ── */
+  --color-text-primary: #1a1714;
+  /* ほぼ黒。純黒より少し茶寄りで柔らかい */
+  --color-text-secondary: #4a4440;
+  /* 本文・説明文 */
+  --color-text-muted: #8a837a;
+  /* ラベル・補足 */
+  --color-text-dim: #b8b0a8;
+  /* プレースホルダー・タイムスタンプ */
+
+  /* ── Borders ── */
+  --color-border: rgba(0, 0, 0, 0.07);
+  --color-border-hover: rgba(0, 0, 0, 0.12);
+  --color-border-accent: rgba(204, 85, 34, 0.25);
 }
 
 /* ============================================

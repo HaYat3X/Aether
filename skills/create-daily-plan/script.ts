@@ -18,7 +18,12 @@ type DailyPlanItem = {
   start_time: string;
   end_time: string;
   memo?: string;
-  target_progress?: number;
+  category?:
+    | "目標関連"
+    | "実務・定常"
+    | "プロジェクト"
+    | "突発・その他"
+    | "雑務";
   related_task_id?: string;
 };
 
@@ -65,9 +70,9 @@ const buildProperties = (
     };
   }
 
-  if (item.target_progress !== undefined) {
-    properties["目標進捗率"] = {
-      number: item.target_progress,
+  if (item.category) {
+    properties["種類"] = {
+      select: { name: item.category },
     };
   }
 

@@ -31,9 +31,16 @@ export const createDailyPlanSchema: Anthropic.Tool["input_schema"] = {
             type: "string",
             description: "メモ（任意）",
           },
-          target_progress: {
-            type: "number",
-            description: "目標進捗率 0.0〜1.0（任意）",
+          category: {
+            type: "string",
+            enum: [
+              "目標関連",
+              "実務・定常",
+              "プロジェクト",
+              "突発・その他",
+              "雑務",
+            ],
+            description: "タスクの種類（任意）。関連タスクの種類から引き継ぐ。",
           },
           related_task_id: {
             type: "string",
